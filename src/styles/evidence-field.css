@@ -1,0 +1,15 @@
+.evidence-field { position: relative; min-height: 44rem; overflow: hidden; border-block: 1px solid var(--line); isolation: isolate; perspective: 850px; }
+.evidence-field.is-receded { background: color-mix(in srgb, var(--paper) 35%, transparent); pointer-events: none; }
+.field-grid { position: absolute; inset: 0; opacity: .45; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 4rem 4rem; mask-image: linear-gradient(to bottom, transparent, black 12%, black 88%, transparent); }
+.field-label { position: absolute; top: 1rem; left: 1rem; z-index: 30; margin: 0; }
+.project-node { position: absolute; left: var(--node-x); top: calc(var(--node-y) + 3rem); z-index: var(--node-z-index); width: min(16rem, 30%); min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: .36rem; border: 1px solid var(--ink); background: color-mix(in srgb, var(--paper) 94%, transparent); padding: .8rem; opacity: var(--node-opacity); text-align: left; transform: translate3d(0, 0, var(--node-z)) scale(var(--node-scale)); transform-origin: center; will-change: transform, opacity; }
+.project-node:hover { opacity: 1; border-color: var(--accent); }
+.project-node.is-inspect-selected { opacity: 1 !important; z-index: 80 !important; border-width: 2px; box-shadow: 0 .9rem 2.4rem color-mix(in srgb, var(--ink) 22%, transparent); transform: translate3d(0, 0, 0) scale(1); }
+.project-node.is-inspect-receded { opacity: .24 !important; transform: translate3d(0, 0, 0) scale(.78); }
+.project-node strong { font-size: 1.1rem; letter-spacing: -.04em; }
+.project-node > span:not(.node-kicker) { min-width: 0; overflow-wrap: anywhere; font-size: .7rem; }
+.node-kicker { color: var(--muted); }
+.node-capabilities { font-family: var(--mono); }
+.visibility { margin-top: .2rem; color: var(--muted); font: .64rem var(--mono) !important; }
+@media (max-width: 900px) { .evidence-field { min-height: auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; padding: 3rem 0 1rem; perspective: none; } .project-node { position: relative; left: auto; top: auto; width: 100%; min-width: 0; transform: translate3d(0, 0, 0) scale(1); } .project-node:hover { transform: translate3d(0, 0, 0) scale(1); } .project-node.is-inspect-selected { transform: translate3d(0, 0, 0) scale(1); } .project-node.is-inspect-receded { transform: translate3d(0, 0, 0) scale(.78); } }
+@media (max-width: 620px) { .evidence-field { grid-template-columns: 1fr; gap: .6rem; padding: 3rem 0 1rem; perspective: none; } .field-grid { display: none; } .project-node { position: relative; left: auto; top: auto; width: 100%; min-width: 0; flex-direction: column; overflow-wrap: anywhere; transform: translate3d(0, 0, 0) scale(1); } .project-node:hover { transform: translate3d(0, 0, 0) scale(1); } .project-node.is-inspect-selected { transform: translate3d(0, 0, 0) scale(1); } .project-node.is-inspect-receded { transform: translate3d(0, 0, 0) scale(.78); } }

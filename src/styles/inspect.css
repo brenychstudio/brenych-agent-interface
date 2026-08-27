@@ -1,0 +1,22 @@
+.inspect-surface, .brief-surface { position: relative; z-index: 60; overflow: visible; max-width: 58rem; margin: 0 0 clamp(2rem, 5vw, 4rem) auto; border-top: 1px solid var(--ink); background: color-mix(in srgb, var(--paper) 94%, transparent); padding: clamp(1.25rem, 4vw, 3rem) 0 0; }
+.inspect-header, .brief-actions { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+.inspect-surface h2, .brief-surface h2 { max-width: 11ch; margin: .4rem 0; font-size: clamp(2.5rem, 7vw, 5.75rem); line-height: .88; letter-spacing: -.07em; }
+.inspect-project { margin: 0 0 1.75rem; font: .8rem var(--mono); }
+.inspect-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0; border-block: 1px solid var(--line); }
+.inspect-facts div { min-width: 0; padding: .75rem; border-right: 1px solid var(--line); }
+.inspect-facts div:last-child { border-right: 0; }
+.inspect-facts dt, .inspect-section h3, .brief-evidence h3 { color: var(--muted); font: 600 .68rem var(--mono); letter-spacing: .08em; }
+.inspect-facts dd { margin: .45rem 0 0; overflow-wrap: anywhere; font-size: .85rem; }
+.inspect-section, .brief-evidence { border-top: 1px solid var(--line); margin-top: 1.25rem; padding-top: .75rem; }
+.inspect-section h3, .brief-evidence h3 { margin: 0 0 .65rem; }
+.inspect-section p, .inspect-section li, .brief-evidence li { font-size: .88rem; line-height: 1.5; }
+.inspect-section ul, .brief-evidence ul { margin: 0; padding-left: 1.1rem; }
+.evidence-claims { list-style: none; padding-left: 0 !important; }
+.evidence-claims li { border-top: 1px solid var(--line); padding: .65rem 0; }
+.evidence-claims p { margin: 0 0 .4rem; }
+.evidence-provenance, .brief-source, .brief-draft-label { color: var(--muted); font: .68rem/1.45 var(--mono) !important; letter-spacing: .03em; }
+.public-links a { color: inherit; }
+.surface-return, .inspect-brief-action, .brief-actions button { border: 1px solid var(--line); background: transparent; padding: .55rem .7rem; font: .68rem var(--mono); letter-spacing: .03em; }
+.surface-return:hover, .brief-actions button:hover { background: var(--ink); color: var(--paper); }
+.inspect-brief-action { margin-top: 1.25rem; }
+@media (max-width: 620px) { .inspect-surface, .brief-surface { margin-left: 0; } .inspect-facts { grid-template-columns: 1fr; } .inspect-facts div { border-right: 0; border-bottom: 1px solid var(--line); } .inspect-header, .brief-actions { align-items: stretch; flex-direction: column; } }
