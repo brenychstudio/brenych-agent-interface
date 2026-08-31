@@ -62,7 +62,7 @@ const schema = {
   brief: objectSchema({
     projectType: { type: "string", description: "A short label for the proposed collaboration or project type.", minLength: 1, maxLength: INPUT_LIMITS.projectTypeLength, pattern: nonWhitespacePattern },
     requirements: requirementsSchema,
-    context: { type: "string", description: "Optional local context to include in the editable brief.", maxLength: INPUT_LIMITS.contextLength },
+    context: { type: "string", description: "Optional project context to include in the page-local editable brief.", maxLength: INPUT_LIMITS.contextLength },
     timeline: { type: "string", description: "Optional timeline note for the editable brief.", maxLength: INPUT_LIMITS.timelineLength },
     budget: { type: "string", description: "Optional budget note for the editable brief.", maxLength: INPUT_LIMITS.budgetLength },
   }, ["projectType", "requirements"]),
@@ -152,7 +152,7 @@ export const createToolDefinitions = (agent: AgentInterface): readonly WebMcpToo
   {
     name: "get_profile",
     title: "Get public profile",
-    description: "Read the public profile for this local evidence workspace.",
+    description: "Read the public profile for this public evidence workspace.",
     inputSchema: schema.empty,
     annotations: { readOnlyHint: true },
     execute: execute((input) => {
@@ -208,7 +208,7 @@ export const createToolDefinitions = (agent: AgentInterface): readonly WebMcpToo
   {
     name: "match_requirements",
     title: "Match requirements",
-    description: "Evaluate supplied requirements against local public evidence and update the local match workspace.",
+    description: "Evaluate supplied requirements against this workspace's public evidence and update its visible page-local match state.",
     inputSchema: schema.match,
     annotations: { readOnlyHint: false, untrustedContentHint: true },
     execute: execute((input, signal) => {
@@ -244,7 +244,7 @@ export const createToolDefinitions = (agent: AgentInterface): readonly WebMcpToo
   {
     name: "create_collaboration_brief",
     title: "Create collaboration brief",
-    description: "Create a local editable collaboration brief from bounded requirements without sending it anywhere.",
+    description: "Create a page-local editable collaboration brief from bounded requirements without sending it anywhere.",
     inputSchema: schema.brief,
     annotations: { readOnlyHint: false, untrustedContentHint: true },
     execute: execute((input, signal) => {

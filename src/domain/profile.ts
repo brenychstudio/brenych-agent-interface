@@ -12,7 +12,7 @@ export const profile: PublicProfile = {
   publicLinks: [{ label: "Brenych Studio", href: "https://brenychstudio.com", kind: "site" }],
   headline: "Public evidence workspace",
   summary:
-    "A local, public-safe index of evidence-backed product and interface work.",
+    "A public-safe index of evidence-backed product and interface work.",
   dataVersion: PUBLIC_EVIDENCE_DATA_VERSION,
   evidenceBoundary: "Public summaries and verified public evidence only; no private repository access.",
 };

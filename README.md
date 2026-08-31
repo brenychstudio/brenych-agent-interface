@@ -1,100 +1,168 @@
 # Brenych Agent Interface
 
-Brenych Agent Interface is a local evidence workspace for showing how a portfolio fits a stated need. It is designed around a simple premise: a portfolio should be able to prove fit, not only present work. A person and a browser agent work against the same visible evidence field, shared semantic state, and bounded actions.
+**A portfolio that can prove fit, not only present work.**
 
-## Why WebMCP
+Brenych Agent Interface (BAI) is a WebMCP evidence workspace where people and agents evaluate real project capabilities together. Instead of making an agent infer structure from portfolio navigation, prose, and screenshots, the page exposes typed tools for profile discovery, evidence search, deterministic matching, visible project focus, and collaboration-brief creation.
 
-WebMCP lets a compatible browser agent use the same constrained application commands as the manual interface. That makes an agent action inspectable: a requirements match visibly recomposes the evidence field, a project focus opens the same evidence inspect, and a brief becomes an editable local draft. It is not a chatbot, an autonomous workflow, or access to private systems.
-
-## Core flow
+The agent does not act in a hidden chat layer. Its state-changing tools update the same visible interface the human inspects and controls:
 
 ```text
-Evidence field → requirements → deterministic match → ranked evidence field
-→ project inspect → why selected → editable local collaboration brief
+match_requirements            → the evidence field recomposes
+focus_project                 → the selected project's evidence opens
+create_collaboration_brief    → a page-local editable brief appears
 ```
 
-The manual composer remains fully usable when `document.modelContext` is unavailable. In that case the readiness indicator reports that WebMCP is unavailable and no browser integration is required to evaluate evidence, inspect a project, or draft a brief.
+**Live URL:** [brenych-agent-interface.pages.dev](https://brenych-agent-interface.pages.dev/) — final verification state is recorded in [`docs/submission/SUBMISSION-FREEZE.md`](docs/submission/SUBMISSION-FREEZE.md).
+
+## Challenge thesis
+
+Without WebMCP, a person can still use the complete manual journey. With WebMCP, an agent can use bounded, typed evidence operations to evaluate requirements, reveal why a project fits, focus the proof, and prepare a reversible brief while the human watches the same page change.
+
+BAI is not a chatbot and does not call an LLM. It has no backend, database, authentication, analytics, private-repository access, or external write path.
+
+## Demo flow
+
+1. Ask the agent to evaluate Brenych Studio for **Electron, MCP, AI automation, and Supabase**.
+2. `match_requirements` runs the deterministic matcher and visibly recomposes the evidence field. BDB, Weekfield, and Distribution Desk carry the strongest relevant evidence.
+3. Ask the agent to open BDB. `focus_project` opens the same Inspect surface available by selecting the BDB node manually.
+4. Review real imagery, verified claims, deterministic **Why Selected** reasoning, limitations, and the public/private boundary.
+5. Ask for a collaboration brief. `create_collaboration_brief` opens an editable draft stored only in current page state.
+6. Evaluate **Swift, Metal, and native iOS** to see unsupported requirements remain visible as a negative fit.
+
+Manual controls provide the same `requirements → match → inspect → brief` flow when WebMCP is unavailable.
+
+## Seven WebMCP tools
+
+BAI registers exactly seven tools through `document.modelContext` when the host API is available:
+
+| Tool | Effect |
+| --- | --- |
+| `get_profile` | Read the public workspace profile. |
+| `get_capabilities` | Search or list the curated capability catalog. |
+| `list_projects` | Search compact public project summaries. |
+| `get_project` | Read one detailed evidence dossier without changing page focus. |
+| `match_requirements` | Evaluate requirements and update visible page-local match state. |
+| `focus_project` | Select and open one public project in Inspect. |
+| `create_collaboration_brief` | Create an editable page-local draft without sending it anywhere. |
+
+The first four tools are read-only. The final three change only reversible local UI state and are truthfully marked non-read-only. No tool can access a filesystem, shell, Git, private repository, database, email, CRM, OAuth token, or arbitrary URL.
 
 ## Architecture
 
-The architecture is intentionally locked:
-
 ```text
-Pure domain → application façade → Zustand semantic state → WebMCP and React UI
+Pure domain → application façade → Zustand semantic state → WebMCP + React UI
 ```
 
-- The pure domain owns public-safe fixtures, normalization, alias resolution, deterministic matching, ranking, evidence collection, and brief derivation.
-- The application façade is the shared command boundary for manual controls and WebMCP tools.
-- Zustand stores reversible semantic transitions rather than matching rules.
-- Motion animates the deterministic depth variables; authored CSS supplies the bounded perspective field and reduced-motion fallback.
-- The WebMCP adapter is an isolated experimental transport boundary.
-- React renders visible state and calls the façade; it does not calculate scores or mutate evidence data.
-- Seven core projects remain the complete scoring corpus. Four Showcase Proofs are media-backed, non-scoring demonstrations and never change match ranks.
-- A typed registry maps 15 optimized screenshot derivatives to project or Showcase Proof records. Screenshots are visual evidence; technical claims come only from verified evidence records.
+- The pure TypeScript domain owns fixtures, normalization, alias resolution, matching, ranking, evidence collection, and brief derivation.
+- The application façade is the one command boundary shared by manual controls and WebMCP tools.
+- Zustand stores reversible semantic transitions, never alternative scoring logic.
+- The WebMCP adapter owns registration, duplicate protection, cancellation, teardown, and unsupported-host fallback.
+- React renders visible state; Motion and authored CSS animate deterministic spatial ranks with a reduced-motion fallback.
 
-## WebMCP tool surface
+## Evidence and scoring integrity
 
-Exactly seven tools are registered when the API is available:
+The scoring corpus contains exactly seven projects:
 
-- `get_profile`
-- `get_capabilities`
-- `list_projects`
-- `get_project`
-- `match_requirements`
-- `focus_project`
-- `create_collaboration_brief`
+`bdb`, `distribution-desk`, `weekfield`, `sprintcrm`, `storyform`, `native-site-control`, and `presence-os-memory-atlas`.
 
-The first four are read-only queries. `match_requirements` updates only reversible local UI state so that the shared evidence field visibly reflects the result; it is therefore explicitly marked non-read-only and flags returned requirement content as untrusted. `focus_project` opens the local inspect surface, and `create_collaboration_brief` creates an in-memory editable draft. Neither performs a network, persistence, CRM, email, or external write. User-authored material returned by the brief tool is marked as untrusted content. No cross-origin exposure option is used.
+Normalization resolves only curated exact capabilities, aliases, and one-hop related edges. Scoring weights are fixed:
 
-## Run
+| Evidence relation | Weight |
+| --- | ---: |
+| Exact | `1.00` |
+| Alias | `0.90` |
+| Related | `0.45` |
+| Missing | `0.00` |
+
+Coverage means **evidence coverage**, not probability or predicted success. There is no fuzzy matching, embedding model, LLM score, screenshot-derived score, or visibility-based weighting. Negative fits remain visible instead of being inflated.
+
+## Human control
+
+WebMCP enhances the page; it is not an availability dependency. Humans can enter requirements, evaluate evidence, inspect every project, edit a brief, copy it, go back, clear the match, and reset the workspace without an agent.
+
+Agent actions are visibly labeled. Inspect and Brief remain reversible, keyboard-accessible page states. A collaboration draft stays in memory and disappears with page state; BAI cannot submit, book, email, persist, or synchronize it.
+
+## Public/private boundary
+
+The field contains seven curated public-safe project records and 15 reviewed WebP evidence derivatives. Screenshot pixels are approved visual evidence, while technical claims come only from verified evidence records. Visible UI text in a screenshot is not treated as technical authority.
+
+Private code, absolute workstation paths, credentials, prompts, customer records, internal RPC names, and execution details are excluded from the dataset and tool results. See [`docs/PUBLIC-EVIDENCE-BOUNDARY.md`](docs/PUBLIC-EVIDENCE-BOUNDARY.md), [`docs/EVIDENCE-MEDIA-MANIFEST.md`](docs/EVIDENCE-MEDIA-MANIFEST.md), and [`ASSET-NOTICE.md`](ASSET-NOTICE.md).
+
+## Supporting studio systems
+
+Four media-led Showcase Proof systems — WEBHERO, Photo Web, Artist Stage, and Model Site — demonstrate supporting studio craft. They are explicitly `scoring = false` and never enter projects, evidence records, ranking, coverage, match IDs, or brief derivation.
+
+## Run locally
+
+Requirements: a current Node.js release and npm.
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
-Quality commands:
+For a production build:
 
 ```bash
+npm run build
 npm run typecheck
 npm run test
 npm run lint
-npm run build
 npm run validate:media
 npm run validate:evals
+npm audit
 ```
 
-There is no required testing flag. If a browser offers WebMCP development support, it may be enabled separately for local experimentation, but the application has no runtime flag or polyfill dependency.
+The Vite production output is written to `dist/`.
 
-## Manual scenarios
+## Enable WebMCP in Chrome
 
-Use the composer, add the requirements, and select **EVALUATE EVIDENCE**.
+Challenge testing supports Google Chrome 149 or later with WebMCP testing enabled:
 
-| Scenario | Requirements | Expected evidence behavior |
-| --- | --- | --- |
-| A | Electron, MCP, AI automation, Supabase | BDB, Distribution Desk, and Weekfield are strong evidence. |
-| B | CRM, Supabase, Gmail, operator workflow | SprintCRM is the strongest evidence. |
-| C | WebGL, XR, spatial archive, interactive interface | Presence OS / Memory Atlas is the strongest evidence. |
-| D | Swift, Metal, native iOS | Low coverage with the missing capabilities visibly retained. |
+1. Open `chrome://flags/#enable-webmcp-testing`.
+2. Enable **WebMCP testing**.
+3. Restart Chrome.
+4. Visit the live BAI URL and inspect `document.modelContext`.
 
-From a result, select a project node to inspect its claims, source labels, limitations, and public boundary. Then create a collaboration brief, edit its local fields, copy it, return to the evidence field, clear the match, or reset the workspace. Keyboard users can focus project nodes and use Enter or Space to inspect and Escape to return.
+Ordinary Chrome does not expose ChatGPT Site Tools. Chrome testing is the direct WebMCP host method described by the challenge rules.
 
-## Evidence, provenance, and private boundary
+## Test with ChatGPT Site Tools
 
-The field contains exactly seven curated public-safe core project records. Four additional Showcase Proofs provide non-scoring visual demonstrations. The media registry contains 15 committed WebP derivatives selected from 19 approved source screenshots; the other four source files remain external reserve material and are not committed.
+Site Tools are tested in the ChatGPT desktop app's built-in browser when the account and selected model have access:
 
-The user explicitly approved the selected screenshot pixels as public visual evidence. That approval does not turn visible UI copy into technical claim authority: screenshots show reviewed visual state, while technical claims remain grounded in verified evidence records. Each visible claim carries explicit visibility and verification provenance. An owner-verified private provenance can support a public-safe summary, but private code, absolute workstation paths, credentials, prompts, customer data, internal RPC names, and execution details are not present in the dataset or tool results.
+1. Open the built-in Browser from the ChatGPT desktop app.
+2. Visit the live BAI URL.
+3. Allow website access when prompted.
+4. Confirm the Site Tools arrow appears in the address bar.
+5. Run the golden prompts in [`docs/submission/TESTING-INSTRUCTIONS.md`](docs/submission/TESTING-INSTRUCTIONS.md).
 
-Matching is local and deterministic: normalized requirements resolve only through curated exact capabilities, aliases, or one-hop related edges. Scores use evidence coverage, not probability, and a stable match ID preserves equivalent requirement sets regardless of input order. The system keeps negative fits visible instead of inflating a result.
+Site Tools use the tools provided by the current page and share its live state. If the feature is unavailable to the account, manual mode remains fully functional and the certification status must be reported as host-limited rather than passed.
 
-## Security and scope
+## Eval corpus
 
-This is a local-only front-end workspace. It has no backend, authentication, database, filesystem or shell access, analytics, remote MCP, LLM calls, runtime network integration, external writes, or stored user draft. The collaboration brief exists only in the current page state and is reversible through visible controls.
+[`evals/webmcp-evals.json`](evals/webmcp-evals.json) contains 28 deterministic cases covering profile and capability discovery, project search and read, direct/ambiguous/negative fit, contextual focus, brief creation, and adversarial requests. Five cases explicitly check that private repositories, credentials, filesystem access, shell commands, and boundary-overriding instructions do not map to unsafe tools.
 
-## Status and limitations
+The eval validator checks corpus structure, bounded arguments, exact tool names, expected UI state, category coverage, and adversarial notes. Expected outputs are not changed to conceal real-host failures.
 
-`BAI-ULTRA-02` is implemented: deterministic matching, seven bounded WebMCP tools, one persistent authored evidence field, semantic ranks and traces, media-backed project inspection, four non-scoring Showcase Proofs, an editable local brief, a 28-case eval corpus, and media/eval validators are covered by automated tests.
+## Hackathon work
 
-Physical browser QA covers 390, 768, and 1366 pixels; structural responsive coverage also includes 430 and 1024 pixels. The complete manual path remains first-class when WebMCP is unavailable.
+BAI itself was created during the 2026 challenge period. The represented source products predate the challenge and contribute reviewed public evidence only. Exact dates, commits, and the boundary between prior work and new challenge implementation are documented in [`docs/submission/HACKATHON-WORK.md`](docs/submission/HACKATHON-WORK.md).
 
-Known limitations: the available Chrome host does not expose `document.modelContext`, so real-host `getTools`/`executeTool` certification is not claimed. Cross-browser certification, probabilistic agent-selection evaluation, production deployment, and submission material remain outside this task and belong to `BAI-ULTRA-03`.
+## Security
+
+- No runtime secret, credential, or environment variable is required.
+- No network write, backend, database, authentication, analytics, remote MCP server, or LLM SDK exists.
+- Security tests scan tracked and untracked release text for workstation paths, credential assignments, provider-token shapes, private-key headers, email addresses, and private/link-local URLs. For the private release gate, set `BAI_PRIVATE_USERNAME` in the shell before running `npm test`; that runtime-only value is scanned case-insensitively and is never committed. Binary publication is restricted to the 15 registered WebPs and five hash- and dimension-pinned release captures.
+- Media tests require exactly 15 registered WebP derivatives; files, hashes, dimensions, captions, ownership, roles, and public-safe semantics must match the manifest, and reserve source stems are rejected.
+- WebMCP lifecycle tests cover cancellation, duplicate registration, teardown, and unsupported-browser fallback.
+
+## License
+
+Software source is licensed under the [Apache License 2.0](LICENSE). Evidence screenshot and trademark boundaries are described in [`ASSET-NOTICE.md`](ASSET-NOTICE.md).
+
+## Release and submission
+
+- Public repository: `https://github.com/brenychstudio/brenych-agent-interface`
+- Live deployment, release commit, tag, and certification state: [`docs/submission/SUBMISSION-FREEZE.md`](docs/submission/SUBMISSION-FREEZE.md)
+- Judge testing: [`docs/submission/TESTING-INSTRUCTIONS.md`](docs/submission/TESTING-INSTRUCTIONS.md)
+- WebMCP certification: [`docs/submission/WEBMCP-CERTIFICATION.md`](docs/submission/WEBMCP-CERTIFICATION.md)

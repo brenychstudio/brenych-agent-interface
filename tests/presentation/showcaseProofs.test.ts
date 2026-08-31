@@ -82,6 +82,7 @@ describe("supporting studio proof separation", () => {
 
     expect(projectVisibilityLabel("public_summary_only")).toBe("PUBLIC SUMMARY");
     expect(verificationLevelLabel("owner_verified_private")).toBe("OWNER-VERIFIED IMPLEMENTATION");
+    expect(verificationLevelLabel("verified_local")).toBe("OWNER-VERIFIED BEFORE PUBLICATION");
     expect(evidenceVisibilityLabel("owner_verified_private")).toBe("OWNER-VERIFIED IMPLEMENTATION");
     expect([
       projectVisibilityLabel("public_summary_only"),

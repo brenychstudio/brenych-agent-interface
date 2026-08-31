@@ -40,8 +40,8 @@ const actionFor = (event: AppEvent): SemanticAction | null => {
   switch (event.type) {
     case "match_evaluated": return { source, type: "match_requirements", message: "Requirements evaluated." };
     case "project_focused": return { source, type: "focus_project", message: "Project selected." };
-    case "brief_created": return { source, type: "create_collaboration_brief", message: "Collaboration brief created locally." };
-    case "brief_updated": return { source, type: "update_collaboration_brief", message: "Collaboration brief updated locally." };
+    case "brief_created": return { source, type: "create_collaboration_brief", message: "Collaboration brief created in page state." };
+    case "brief_updated": return { source, type: "update_collaboration_brief", message: "Collaboration brief updated in page state." };
     case "mode_closed": return { source, type: "close", message: "Returned to the prior workspace." };
     case "match_cleared": return { source, type: "clear_match", message: "Requirement evaluation cleared." };
     case "semantic_reset": return { source, type: "reset", message: "Semantic user state reset." };

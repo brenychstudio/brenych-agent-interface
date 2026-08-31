@@ -30,12 +30,15 @@ describe("WebMCP tool definitions", () => {
     for (const tool of Object.values(byName)) {
       expect(tool.title).toMatch(/\S/);
       expect(tool.description).toMatch(/\S/);
+      expect(tool.description).not.toMatch(/local evidence workspace|local public evidence/i);
     }
 
+    expect(byName.get_profile.description).toMatch(/public evidence workspace/i);
     expect(byName.get_capabilities.description).toMatch(/capabilit/i);
     expect(byName.get_capabilities.description).toMatch(/catalog|list/i);
     expect(byName.match_requirements.description).toMatch(/requirement/i);
     expect(byName.match_requirements.description).toMatch(/match|evaluat/i);
+    expect(byName.match_requirements.description).toMatch(/page-local|visible state/i);
     expect(byName.get_project.description).toMatch(/dossier|detail/i);
     expect(byName.focus_project.description).toMatch(/focus|select/i);
     expect(byName.focus_project.description).toMatch(/workspace/i);
@@ -50,6 +53,7 @@ describe("WebMCP tool definitions", () => {
     const projectSchema = byName.get_project.inputSchema as Record<string, unknown>;
     const matchSchema = byName.match_requirements.inputSchema as Record<string, unknown>;
     const briefSchema = byName.create_collaboration_brief.inputSchema as Record<string, unknown>;
+    const briefProperties = briefSchema.properties as Record<string, Record<string, unknown>>;
 
     expect(capabilitySchema).toMatchObject({ type: "object", additionalProperties: false, properties: { query: { maxLength: INPUT_LIMITS.queryLength }, limit: { maximum: INPUT_LIMITS.capabilityLimit } } });
     expect(projectsSchema).toMatchObject({ type: "object", additionalProperties: false, properties: { query: { maxLength: INPUT_LIMITS.queryLength }, limit: { maximum: INPUT_LIMITS.projectLimit } } });
@@ -57,6 +61,7 @@ describe("WebMCP tool definitions", () => {
     expect(projectSchema).toMatchObject({ type: "object", additionalProperties: false, required: ["projectId"], properties: { projectId: { enum: ["bdb", "distribution-desk", "weekfield", "sprintcrm", "storyform", "native-site-control", "presence-os-memory-atlas"] } } });
     expect(matchSchema).toMatchObject({ type: "object", additionalProperties: false, required: ["requirements"], properties: { requirements: { minItems: 1, maxItems: INPUT_LIMITS.requirementCount, items: { minLength: 1, maxLength: INPUT_LIMITS.requirementLength } } } });
     expect(briefSchema).toMatchObject({ type: "object", additionalProperties: false, required: ["projectType", "requirements"], properties: { projectType: { minLength: 1, maxLength: INPUT_LIMITS.projectTypeLength }, context: { maxLength: INPUT_LIMITS.contextLength }, timeline: { maxLength: INPUT_LIMITS.timelineLength }, budget: { maxLength: INPUT_LIMITS.budgetLength } } });
+    expect(briefProperties.context.description).not.toMatch(/local context/i);
   });
 
   it("documents every tool argument, including array entry semantics", () => {
@@ -154,5 +159,6 @@ describe("WebMCP tool definitions", () => {
     if (!result.ok) throw new Error("expected a successful profile result");
     expect(result.data.evidenceBoundary).toMatch(/public evidence|public summar/i);
     expect(result.data.evidenceBoundary).not.toMatch(/[\\/]|\.md$/i);
+    expect(result.data.summary).not.toMatch(/\blocal\b/i);
   });
 });

@@ -20,7 +20,7 @@ describe("collaboration brief", () => {
     fireEvent.click(screen.getByRole("button", { name: "CREATE COLLABORATION BRIEF" }));
 
     expect(screen.getByRole("heading", { name: "PROJECT BRIEF" })).toHaveFocus();
-    expect(screen.getByText("LOCAL DRAFT ONLY")).toBeInTheDocument();
+    expect(screen.getByText("PAGE-LOCAL DRAFT ONLY")).toBeInTheDocument();
     expect(screen.getByText("NO SEND")).toBeInTheDocument();
     expect(screen.getByText("NO CRM")).toBeInTheDocument();
     expect(screen.getByText("NO NETWORK WRITE")).toBeInTheDocument();

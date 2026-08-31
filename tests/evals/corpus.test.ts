@@ -32,6 +32,36 @@ const capabilityIds = new Set(["electron", "mcp", "ai-automation", "supabase", "
 const capabilityCategories = new Set(["Desktop applications", "Agent interfaces", "Workflow automation", "Product workflows", "Communication workflows", "Spatial web", "Interactive interfaces", "Editorial workflows", "Site control"]);
 const maturities = new Set(["owner_verified_implementation", "beta_ready_prototype", "public_case", "functional_mvp_prototype"]);
 const requiredCategories = new Set(["profile-discovery", "capability-discovery", "project-search", "project-read", "direct-fit", "ambiguous-fit", "negative-fit", "contextual-focus", "brief", "adversarial"]);
+const expectedIds = [
+  "profile-public-workspace",
+  "profile-local-boundary",
+  "capabilities-mcp-query",
+  "capabilities-spatial-category",
+  "capabilities-crm-query",
+  "projects-electron-search",
+  "projects-public-beta-search",
+  "projects-spatial-search",
+  "project-weekfield-read-only",
+  "project-native-site-control-read-only",
+  "direct-fit-electron-mcp",
+  "direct-fit-crm-workflow",
+  "direct-fit-spatial-web",
+  "ambiguous-fit-mcp-automation",
+  "ambiguous-fit-supabase-operations",
+  "ambiguous-fit-electron-publishing",
+  "negative-fit-swift",
+  "negative-fit-metal",
+  "negative-fit-native-ios",
+  "focus-bdb-after-match",
+  "focus-presence-after-match",
+  "brief-after-electron-match",
+  "brief-after-crm-match",
+  "adversarial-private-repository",
+  "adversarial-filesystem-path",
+  "adversarial-token-exfiltration",
+  "adversarial-shell-command",
+  "adversarial-ignore-boundary",
+] as const;
 
 const isRecord = (value: unknown): value is JsonRecord => value !== null && typeof value === "object" && !Array.isArray(value);
 const keysAreOnly = (value: JsonRecord, allowed: readonly string[]) => Object.keys(value).every((key) => allowed.includes(key));
@@ -101,7 +131,7 @@ const validateState = (evalCase: WebMcpEvalCase): void => {
   if (state.collaborationDraft !== undefined) assert(state.collaborationDraft === true, `${evalCase.id}: brief state must assert a local draft`);
 };
 
-describe("BAI-ULTRA-02 WebMCP evaluation corpus", () => {
+describe("BAI-ULTRA-03 WebMCP evaluation corpus", () => {
   it("validates the deterministic corpus contract without an LLM or API", () => {
     expect(existsSync(corpusPath), `Missing eval corpus: ${corpusPath}`).toBe(true);
     const corpus: unknown = JSON.parse(readFileSync(corpusPath, "utf8"));
@@ -110,7 +140,7 @@ describe("BAI-ULTRA-02 WebMCP evaluation corpus", () => {
       assert(false, "The eval corpus must be a JSON array");
       return;
     }
-    assert(corpus.length >= 24, "The eval corpus needs at least 24 cases");
+    assert(corpus.length === expectedIds.length, "The release corpus must retain exactly 28 cases");
 
     const ids = new Set<string>();
     const categories = new Set<string>();
@@ -140,7 +170,8 @@ describe("BAI-ULTRA-02 WebMCP evaluation corpus", () => {
         assert(isNonEmptyString(evalCase.notes) && /(?:private|filesystem|token|shell|boundary|credential|ignore)/i.test(evalCase.notes), `${evalCase.id}: adversarial notes must state the unsafe boundary`);
       }
     }
+    expect(ids).toEqual(new Set(expectedIds));
     for (const category of requiredCategories) assert(categories.has(category), `Missing required category: ${category}`);
-    assert(adversarialCount >= 5, "The corpus needs five adversarial no-tool cases");
+    assert(adversarialCount === 5, "The release corpus must retain exactly five adversarial no-tool cases");
   });
 });

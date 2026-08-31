@@ -84,7 +84,7 @@ export const CollaborationBrief = ({
       }, "manual");
       setError(null);
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "The local draft could not be updated.");
+      setError(cause instanceof Error ? cause.message : "The page-local draft could not be updated.");
     }
   };
 
@@ -128,12 +128,12 @@ export const CollaborationBrief = ({
         <div>
           <p className="eyebrow">HUMAN-CONTROLLED HANDOFF</p>
           <h2 id="brief-heading" tabIndex={-1} ref={headingRef}>PROJECT BRIEF</h2>
-          <p className="brief-draft-label">EDITABLE LOCAL WORKING DOCUMENT</p>
+          <p className="brief-draft-label">EDITABLE PAGE-LOCAL WORKING DOCUMENT</p>
         </div>
         <button type="button" className="surface-return" onClick={() => agent.close("manual")}>BACK TO EVIDENCE</button>
       </header>
       <div className="brief-authority" aria-label="Brief authority boundary">
-        <strong>LOCAL DRAFT ONLY</strong>
+        <strong>PAGE-LOCAL DRAFT ONLY</strong>
         <span>NO SEND</span>
         <span>NO CRM</span>
         <span>NO NETWORK WRITE</span>

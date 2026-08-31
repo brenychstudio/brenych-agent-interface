@@ -11,7 +11,7 @@ const projectVisibilityLabels: Readonly<Record<PublicVisibility, string>> = {
 
 const verificationLevelLabels: Readonly<Record<VerificationLevel, string>> = {
   verified_remote: "VERIFIED PUBLIC IMPLEMENTATION",
-  verified_local: "LOCALLY VERIFIED IMPLEMENTATION",
+  verified_local: "OWNER-VERIFIED BEFORE PUBLICATION",
   portfolio_public: "PUBLIC PORTFOLIO EVIDENCE",
   owner_verified_private: "OWNER-VERIFIED IMPLEMENTATION",
 };

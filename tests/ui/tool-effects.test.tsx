@@ -93,7 +93,7 @@ describe("WebMCP visible tool effects", () => {
     expect(screen.getByText(`SOURCE MATCH: ${manualBrief.sourceMatchId}`)).toBeInTheDocument();
     expect(screen.getByRole("region", { name: "RELEVANT EVIDENCE PROJECTS" })).toHaveTextContent("BDB");
     expect(screen.getByText("KNOWN GAPS")).toBeInTheDocument();
-    expect(screen.getByRole("status")).toHaveTextContent("WebMCP action: Collaboration brief created locally.");
+    expect(screen.getByRole("status")).toHaveTextContent("WebMCP action: Collaboration brief created in page state.");
 
     const context = screen.getByRole("textbox", { name: "Context" });
     fireEvent.change(context, { target: { value: "A human-reviewed local draft." } });
