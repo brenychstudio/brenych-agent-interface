@@ -45,6 +45,7 @@ describe("WebMCP visible tool effects", () => {
     expect(screen.getByText(manualResult.labels.coverage)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Project BDB.*foreground.*matched/i })).toBeInTheDocument();
     expect(screen.getByRole("status")).toHaveTextContent("WebMCP action: Requirements evaluated.");
+    expect(screen.getByLabelText("Shared surface control provenance")).toHaveTextContent("WEBMCP ACTION");
 
     await lifecycle.stop();
   });
@@ -99,6 +100,26 @@ describe("WebMCP visible tool effects", () => {
     fireEvent.blur(context);
     expect(context).toHaveValue("A human-reviewed local draft.");
 
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.queryByRole("heading", { name: "PROJECT BRIEF" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Project BDB, rank 1/ })).toHaveFocus();
+
+    await lifecycle.stop();
+  });
+
+  it("restores the WebMCP-focused project after an earlier manual inspection", async () => {
+    const { lifecycle, tools } = await setupControlledApp();
+    await tools.match_requirements.execute({ requirements: ["Electron", "MCP"] }, { signal: new AbortController().signal });
+
+    fireEvent.click(screen.getByRole("button", { name: /Project BDB, rank 1/ }));
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.getByRole("button", { name: /Project BDB, rank 1/ })).toHaveFocus();
+
+    await tools.focus_project.execute({ projectId: "weekfield" }, { signal: new AbortController().signal });
+    expect(screen.getByText("Weekfield", { selector: ".inspect-project" })).toBeInTheDocument();
+    fireEvent.keyDown(document, { key: "Escape" });
+
+    expect(screen.getByRole("button", { name: /Project Weekfield, rank 4/ })).toHaveFocus();
     await lifecycle.stop();
   });
 });

@@ -60,8 +60,10 @@ export const CollaborationBrief = ({
   const [error, setError] = useState<string | null>(null);
   const [copyStatus, setCopyStatus] = useState<string | null>(null);
   const [fallbackText, setFallbackText] = useState<string | null>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
   const fallbackRef = useRef<HTMLTextAreaElement>(null);
 
+  useEffect(() => { headingRef.current?.focus(); }, []);
   useEffect(() => { setValues(toEditable(brief)); }, [brief]);
   useEffect(() => {
     if (fallbackText) {
@@ -122,9 +124,20 @@ export const CollaborationBrief = ({
 
   return (
     <section className="brief-surface" aria-labelledby="brief-heading">
-      <p className="eyebrow">LOCAL / REVERSIBLE</p>
-      <h2 id="brief-heading">PROJECT BRIEF</h2>
-      <p className="brief-draft-label">DRAFT</p>
+      <header className="brief-header">
+        <div>
+          <p className="eyebrow">HUMAN-CONTROLLED HANDOFF</p>
+          <h2 id="brief-heading" tabIndex={-1} ref={headingRef}>PROJECT BRIEF</h2>
+          <p className="brief-draft-label">EDITABLE LOCAL WORKING DOCUMENT</p>
+        </div>
+        <button type="button" className="surface-return" onClick={() => agent.close("manual")}>BACK TO EVIDENCE</button>
+      </header>
+      <div className="brief-authority" aria-label="Brief authority boundary">
+        <strong>LOCAL DRAFT ONLY</strong>
+        <span>NO SEND</span>
+        <span>NO CRM</span>
+        <span>NO NETWORK WRITE</span>
+      </div>
       <div className="brief-fields">
         <label>Project type<input aria-label="Project type" value={values.projectType} maxLength={PUBLIC_INPUT_LIMITS.projectTypeLength} onChange={(event) => setValues({ ...values, projectType: event.target.value })} onBlur={(event) => save("projectType", event.target.value)} /></label>
         <label>Requirements<textarea aria-label="Requirements" aria-describedby="brief-requirements-hint" value={values.requirements} maxLength={BRIEF_REQUIREMENTS_MAX_LENGTH} onChange={(event) => updateRequirements(event.target.value)} onBlur={(event) => save("requirements", event.target.value)} /></label>
@@ -135,7 +148,7 @@ export const CollaborationBrief = ({
       </div>
       <section className="brief-evidence" aria-labelledby="relevant-projects-heading">
         <h3 id="relevant-projects-heading">RELEVANT EVIDENCE PROJECTS</h3>
-        <ul>{relevantProjects.map((project) => <li key={project.id}>{project.title}</li>)}</ul>
+        <ul className="evidence-chip-list">{relevantProjects.map((project) => <li className="evidence-chip" key={project.id}>{project.title}</li>)}</ul>
       </section>
       <section className="brief-evidence" aria-labelledby="known-gaps-heading">
         <h3 id="known-gaps-heading">KNOWN GAPS</h3>
@@ -144,7 +157,6 @@ export const CollaborationBrief = ({
       <p className="brief-source">SOURCE MATCH: {brief.sourceMatchId}</p>
       <div className="brief-actions">
         <button type="button" className="primary-action" onClick={() => { void copy(); }}>COPY BRIEF</button>
-        <button type="button" className="surface-return" onClick={() => agent.close("manual")}>BACK TO EVIDENCE</button>
       </div>
       {fallbackText ? <textarea ref={fallbackRef} className="brief-copy-fallback" aria-label="Copyable brief text" value={fallbackText} readOnly /> : null}
       {copyStatus ? <p className="copy-status" role="status" aria-live="polite">{copyStatus}</p> : null}

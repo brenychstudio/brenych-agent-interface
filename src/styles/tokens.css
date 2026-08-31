@@ -8,5 +8,14 @@
   --muted: #655f55;
   --line: #bdb8aa;
   --accent: #545a41;
+  --stage: #101315;
+  --stage-deep: #080a0c;
+  --stage-panel: #151a1d;
+  --stage-ink: #f0eee6;
+  --stage-muted: #9da4a1;
+  --stage-line: #2f3839;
+  --stage-line-strong: #465052;
+  --stage-accent: #a9be9b;
+  --stage-glow: #71816a;
   --mono: "SFMono-Regular", Consolas, monospace;
 }

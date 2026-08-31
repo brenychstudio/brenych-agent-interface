@@ -8,6 +8,7 @@ import "./styles/shell.css";
 import "./styles/evidence-field.css";
 import "./styles/inspect.css";
 import "./styles/brief.css";
+import "./styles/showcase.css";
 
 const root = document.getElementById("root");
 if (!root) throw new Error("Root element is missing");

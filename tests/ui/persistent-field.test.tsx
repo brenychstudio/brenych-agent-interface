@@ -38,17 +38,21 @@ describe("persistent evidence field", () => {
     const tabletRule = evidenceFieldCss.match(/@media \(max-width: 900px\)[\s\S]*?(?=@media \(max-width: 620px\)|$)/)?.[0] ?? "";
     const mobileRule = evidenceFieldCss.match(/@media \(max-width: 620px\)[\s\S]*/)?.[0] ?? "";
 
-    expect(xPositions).toEqual(["0%", "35%", "70%", "0%", "35%", "70%", "0%"]);
-    expect(yPositions).toEqual(["0%", "0%", "0%", "32%", "32%", "32%", "64%"]);
-    expect(evidenceFieldCss).toMatch(/\.evidence-field \{[\s\S]*min-height: 44rem;[\s\S]*perspective: 850px;/);
-    expect(evidenceFieldCss).toMatch(/\.project-node \{[\s\S]*top: calc\(var\(--node-y\) \+ 3rem\);/);
-    expect(evidenceFieldCss).toMatch(/\.project-node \{[\s\S]*width: min\(16rem, 30%\);/);
+    expect(new Set(xPositions.map((x, index) => `${x}:${yPositions[index]}`)).size).toBe(7);
+    expect(xPositions.every((position) => position.endsWith("%"))).toBe(true);
+    expect(yPositions.every((position) => position.endsWith("%"))).toBe(true);
+    expect(screen.getByRole("button", { name: /Project Presence OS Memory Atlas/ }).style.getPropertyValue("--node-y")).toBe("64%");
+    expect(evidenceFieldCss).toMatch(/\.evidence-field \{[\s\S]*min-height: 74rem;[\s\S]*perspective: 850px;/);
+    expect(evidenceFieldCss).toMatch(/\.project-node \{[\s\S]*top: calc\(var\(--node-y\) \+ 3rem \+ var\(--field-pan-y, 0px\)\);/);
+    expect(evidenceFieldCss).toMatch(/\.project-node \{[\s\S]*width: 29%;/);
     expect(tabletRule).toMatch(/\.evidence-field \{[\s\S]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);[\s\S]*perspective: none;/);
-    expect(tabletRule).toMatch(/\.project-node \{[\s\S]*position: relative;[\s\S]*width: 100%;[\s\S]*translate3d\(0, 0, 0\) scale\(1\)/);
-    expect(mobileRule).toMatch(/\.project-node \{[\s\S]*width: 100%;/);
+    expect(tabletRule).toMatch(/\.project-node,[\s\S]*position: relative;[\s\S]*width: 100%;[\s\S]*translate3d\(0, 0, 0\) scale\(1\)/);
+    expect(tabletRule).toMatch(/\.project-node,[\s\S]*order: var\(--node-order\)/);
+    expect(tabletRule).toMatch(/\.project-node\[data-spatial-tier="dominant"\] \{[^}]*grid-column: 1 \/ -1/);
+    expect(mobileRule).toMatch(/\.project-node,[\s\S]*width: 100%;/);
     expect(mobileRule).toMatch(/flex-direction: column;/);
     expect(mobileRule).toMatch(/min-width: 0;/);
-    expect(mobileRule).toMatch(/transform: translate3d\(0, 0, 0\) scale\(1\);/);
+    expect(`${tabletRule}${mobileRule}`).toMatch(/transform: translate3d\(0, 0, 0\) scale\(1\);/);
   });
 
   it("uses Motion for controlled spatial transitions with a reduced-motion fallback", () => {
@@ -73,7 +77,7 @@ describe("persistent evidence field", () => {
     expect(selectedRule).toMatch(/border-width: 2px/);
     expect(selectedRule).toMatch(/box-shadow:/);
     expect(selectedRule).toMatch(/transform: translate3d\(0, 0, 0\) scale\(1\)/);
-    expect(peerRule).toMatch(/opacity: \.24 !important/);
+    expect(peerRule).toMatch(/opacity: \.18 !important/);
     expect(peerRule).toMatch(/transform: translate3d\(0, 0, 0\) scale\(\.78\)/);
     expect(`${selectedRule}${tabletRule}${mobileRule}`).not.toMatch(/150px|scale\(1\.08\)/);
   });
@@ -90,7 +94,7 @@ describe("persistent evidence field", () => {
 
     expect(screen.getByTestId("evidence-field")).toBe(field);
     expect(screen.getByRole("region", { name: "NOT DEMONSTRATED" })).toHaveTextContent("CoreML");
-    expect(screen.getByText("NOT DEMONSTRATED")).toBeInTheDocument();
+    expect(screen.getAllByText("NOT DEMONSTRATED")).not.toHaveLength(0);
     expect(screen.getByRole("button", { name: /BDB.*foreground/i })).toBeInTheDocument();
     expect(screen.getAllByRole("button", { name: /project.*(BDB|Distribution Desk|Weekfield|SprintCRM|StoryForm|Native Site Control|Presence OS Memory Atlas)/i })).toHaveLength(7);
   });

@@ -29,6 +29,8 @@ Pure domain → application façade → Zustand semantic state → WebMCP and Re
 - Motion animates the deterministic depth variables; authored CSS supplies the bounded perspective field and reduced-motion fallback.
 - The WebMCP adapter is an isolated experimental transport boundary.
 - React renders visible state and calls the façade; it does not calculate scores or mutate evidence data.
+- Seven core projects remain the complete scoring corpus. Four Showcase Proofs are media-backed, non-scoring demonstrations and never change match ranks.
+- A typed registry maps 15 optimized screenshot derivatives to project or Showcase Proof records. Screenshots are visual evidence; technical claims come only from verified evidence records.
 
 ## WebMCP tool surface
 
@@ -58,6 +60,8 @@ npm run typecheck
 npm run test
 npm run lint
 npm run build
+npm run validate:media
+npm run validate:evals
 ```
 
 There is no required testing flag. If a browser offers WebMCP development support, it may be enabled separately for local experimentation, but the application has no runtime flag or polyfill dependency.
@@ -77,7 +81,9 @@ From a result, select a project node to inspect its claims, source labels, limit
 
 ## Evidence, provenance, and private boundary
 
-The field contains seven curated public-safe project records. Each visible claim carries explicit visibility and verification provenance. An owner-verified private provenance can support a public-safe summary, but private code, paths, credentials, prompts, customer data, internal RPC names, and execution details are not present in the dataset or tool results.
+The field contains exactly seven curated public-safe core project records. Four additional Showcase Proofs provide non-scoring visual demonstrations. The media registry contains 15 committed WebP derivatives selected from 19 approved source screenshots; the other four source files remain external reserve material and are not committed.
+
+The user explicitly approved the selected screenshot pixels as public visual evidence. That approval does not turn visible UI copy into technical claim authority: screenshots show reviewed visual state, while technical claims remain grounded in verified evidence records. Each visible claim carries explicit visibility and verification provenance. An owner-verified private provenance can support a public-safe summary, but private code, absolute workstation paths, credentials, prompts, customer data, internal RPC names, and execution details are not present in the dataset or tool results.
 
 Matching is local and deterministic: normalized requirements resolve only through curated exact capabilities, aliases, or one-hop related edges. Scores use evidence coverage, not probability, and a stable match ID preserves equivalent requirement sets regardless of input order. The system keeps negative fits visible instead of inflating a result.
 
@@ -87,8 +93,8 @@ This is a local-only front-end workspace. It has no backend, authentication, dat
 
 ## Status and limitations
 
-`BAI-ULTRA-01` is a P0 functional vertical slice: deterministic evidence matching, seven bounded WebMCP tools, one persistent UI, a Motion-backed structural 2.5D field, inspect, editable local brief, keyboard foundations, reduced-motion handling, and structural checks at 390, 768, and 1366 pixels are implemented and covered by automated tests.
+`BAI-ULTRA-02` is implemented: deterministic matching, seven bounded WebMCP tools, one persistent authored evidence field, semantic ranks and traces, media-backed project inspection, four non-scoring Showcase Proofs, an editable local brief, a 28-case eval corpus, and media/eval validators are covered by automated tests.
 
-Known limitations: jsdom verifies structural responsive availability rather than pixels; real-browser WebMCP availability depends on the host browser and is not claimed here; no cross-browser certification, full accessibility certification, WebMCP agent selection evals, WebGL, advanced spatial physics, production deployment, or submission material is included.
+Physical browser QA covers 390, 768, and 1366 pixels; structural responsive coverage also includes 430 and 1024 pixels. The complete manual path remains first-class when WebMCP is unavailable.
 
-`BAI-ULTRA-02` is the next task for hardening, spatial polish, and eval work; it is not implemented in this repository state.
+Known limitations: the available Chrome host does not expose `document.modelContext`, so real-host `getTools`/`executeTool` certification is not claimed. Cross-browser certification, probabilistic agent-selection evaluation, production deployment, and submission material remain outside this task and belong to `BAI-ULTRA-03`.

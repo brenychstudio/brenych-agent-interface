@@ -3,7 +3,7 @@
 **Status:** Approved for implementation
 **Date:** 2026-08-27
 **Target:** Codex 5.6 Ultra / VS Code / Windows
-**Workspace:** `C:\PROJECTS\brenych-agent-interface`
+**Workspace:** repository root
 
 ## Mission
 

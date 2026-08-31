@@ -51,6 +51,7 @@ export interface ProjectNodeState {
   readonly projectId: ProjectId;
   readonly rank: number | null;
   readonly matchState: "not_evaluated" | "matched" | "partial" | "unmatched";
+  readonly spatialTier: "field" | "dominant" | "near" | "secondary" | "receded";
   readonly transform: {
     readonly x: number;
     readonly y: number;
@@ -61,6 +62,26 @@ export interface ProjectNodeState {
   };
 }
 
+const defaultPositions = [
+  { x: 3, y: 4 },
+  { x: 37, y: 9 },
+  { x: 69, y: 3 },
+  { x: 7, y: 47 },
+  { x: 38, y: 44 },
+  { x: 71, y: 49 },
+  { x: 36, y: 64 },
+] as const;
+
+const rankedPositions = [
+  { x: 34, y: 3 },
+  { x: 3, y: 33 },
+  { x: 67, y: 33 },
+  { x: 1, y: 58 },
+  { x: 26, y: 61 },
+  { x: 51, y: 58 },
+  { x: 76, y: 61 },
+] as const;
+
 export const selectProjectNodeStates = (state: AppSemanticState): readonly ProjectNodeState[] => {
   const rankByProject = new Map(state.matchResult?.rankedProjects.map((project, index) => [project.projectId, { project, rank: index + 1 }]) ?? []);
   return projects.map((project, index) => {
@@ -70,21 +91,79 @@ export const selectProjectNodeStates = (state: AppSemanticState): readonly Proje
       : !ranked || ranked.project.score === 0
         ? "unmatched"
         : ranked.project.matchedRequirementIds.length > 0 ? "matched" : "partial";
-    const leading = ranked !== undefined && ranked.project.score > 0 && ranked.rank <= 3;
+    const hasEvidence = ranked !== undefined && ranked.project.score > 0;
+    const spatialTier: ProjectNodeState["spatialTier"] = !state.matchResult
+      ? "field"
+      : !hasEvidence
+        ? "receded"
+        : ranked.rank === 1
+          ? "dominant"
+          : ranked.rank <= 3
+            ? "near"
+            : "secondary";
+    const position = state.matchResult
+      ? rankedPositions[(ranked?.rank ?? index + 1) - 1] ?? rankedPositions[index]
+      : defaultPositions[index];
+    const visual = spatialTier === "dominant"
+      ? { z: 36, scale: 1.12, opacity: 1, zIndex: 40 }
+      : spatialTier === "near"
+        ? { z: 4, scale: 1, opacity: 0.94, zIndex: 28 - (ranked?.rank ?? 0) }
+        : spatialTier === "secondary"
+          ? { z: -44, scale: 0.84, opacity: 0.66, zIndex: 10 }
+          : spatialTier === "receded"
+            ? { z: -88, scale: 0.8, opacity: 0.42, zIndex: 5 }
+            : { z: -18, scale: 1, opacity: 0.9, zIndex: 12 - index };
     return {
       projectId: project.id,
       rank: state.matchResult ? ranked?.rank ?? null : null,
       matchState,
+      spatialTier,
       transform: {
-        x: (index % 3) * 35,
-        y: Math.floor(index / 3) * 32,
-        z: !state.matchResult ? -40 : leading ? 0 : ranked && ranked.project.score > 0 ? -40 : -80,
-        scale: leading ? 1 : ranked && ranked.project.score > 0 ? 0.95 : 0.92,
-        opacity: leading ? 1 : ranked && ranked.project.score > 0 ? 0.66 : state.matchResult ? 0.42 : 0.56,
-        zIndex: leading ? 20 - ranked.rank : ranked && ranked.project.score > 0 ? 8 : 4,
+        x: position.x,
+        y: position.y,
+        ...visual,
       },
     };
   });
+};
+
+export interface CapabilityTrace {
+  readonly requirementId: string;
+  readonly requirement: string;
+  readonly capabilityId: string;
+  readonly capability: string;
+  readonly projectId: ProjectId;
+  readonly project: string;
+}
+
+export const selectCapabilityTraces = (state: AppSemanticState): readonly CapabilityTrace[] => {
+  if (state.activeMode !== "match" || !state.matchResult) return [];
+
+  return state.matchResult.requirements
+    .filter((requirement) => requirement.label !== "missing")
+    .flatMap((requirement) => {
+      const candidates = state.matchResult?.rankedProjects.flatMap((ranked, rankIndex) =>
+        ranked.evidence
+          .filter((item) => item.requirementId === requirement.id)
+          .map((item) => ({ item, rankIndex })),
+      ) ?? [];
+      const strongest = candidates.sort(
+        (left, right) => right.item.strength - left.item.strength || left.rankIndex - right.rankIndex,
+      )[0];
+      if (!strongest) return [];
+      const capability = capabilities.find((item) => item.id === strongest.item.capabilityId);
+      const project = projects.find((item) => item.id === strongest.item.projectId);
+      if (!capability || !project) return [];
+      return [{
+        requirementId: requirement.id,
+        requirement: requirement.original,
+        capabilityId: capability.id,
+        capability: capability.label,
+        projectId: project.id,
+        project: project.displayName,
+      }];
+    })
+    .slice(0, 5);
 };
 
 export const selectProjectEvidenceIds = (projectId: ProjectId): readonly string[] => evidenceRecords.filter((record) => record.projectId === projectId).map((record) => record.id);

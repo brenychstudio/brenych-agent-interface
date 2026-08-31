@@ -50,6 +50,9 @@ export const RequirementComposer = ({
     <section className="requirement-composer" aria-labelledby="requirement-heading">
       <p className="eyebrow">MANUAL REQUIREMENTS</p>
       <h1 id="requirement-heading">WHAT ARE YOU BUILDING?</h1>
+      <p className="composer-thesis">
+        An agent can rank, focus, and draft from the same public evidence you inspect here. Manual control always remains available.
+      </p>
       <div className="example-chips" aria-label="Requirement examples">
         {examples.map((example) => (
           <button key={example} type="button" className="chip" aria-label={`Add ${example}`} onClick={() => addRequirement(example)}>

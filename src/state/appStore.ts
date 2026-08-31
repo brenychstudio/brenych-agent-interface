@@ -35,7 +35,7 @@ const freezeStoreState = (state: AppStore): AppStore =>
       : null,
   });
 
-const actionFor = (event: AppEvent): SemanticAction => {
+const actionFor = (event: AppEvent): SemanticAction | null => {
   const source = event.provenance;
   switch (event.type) {
     case "match_evaluated": return { source, type: "match_requirements", message: "Requirements evaluated." };
@@ -45,7 +45,7 @@ const actionFor = (event: AppEvent): SemanticAction => {
     case "mode_closed": return { source, type: "close", message: "Returned to the prior workspace." };
     case "match_cleared": return { source, type: "clear_match", message: "Requirement evaluation cleared." };
     case "semantic_reset": return { source, type: "reset", message: "Semantic user state reset." };
-    case "registration_changed": return { source, type: "registration_state", message: "WebMCP registration state updated." };
+    case "registration_changed": return null;
   }
 };
 
@@ -56,7 +56,7 @@ const pushMode = (state: AppSemanticState, next: ActiveMode): Pick<AppSemanticSt
 };
 
 export const reduceAppEvent = (state: AppSemanticState, event: AppEvent): AppSemanticState => {
-  const currentAgentAction = actionFor(event);
+  const currentAgentAction = actionFor(event) ?? state.currentAgentAction;
   switch (event.type) {
     case "match_evaluated":
       return { ...state, activeMode: "match", modeHistory: ["field"], requirements: cloneRequirements(event.requirements), matchResult: event.match, focusedProjectId: null, collaborationDraft: null, currentAgentAction };

@@ -59,9 +59,11 @@ export interface Project {
   readonly publicEvidenceName?: string;
   readonly productType: string;
   readonly maturity: ProjectMaturity;
+  readonly maturityLabel: string;
   readonly visibility: PublicVisibility;
   readonly verificationLevels: readonly VerificationLevel[];
   readonly summary: string;
+  readonly verifiedHighlights: readonly string[];
   readonly capabilityIds: readonly CapabilityId[];
   readonly limitations: readonly string[];
   readonly links: readonly PublicLink[];

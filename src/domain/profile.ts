@@ -14,5 +14,5 @@ export const profile: PublicProfile = {
   summary:
     "A local, public-safe index of evidence-backed product and interface work.",
   dataVersion: PUBLIC_EVIDENCE_DATA_VERSION,
-  evidenceBoundary: "docs/PUBLIC-EVIDENCE-BOUNDARY.md",
+  evidenceBoundary: "Public summaries and verified public evidence only; no private repository access.",
 };

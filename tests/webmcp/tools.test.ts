@@ -23,6 +23,25 @@ describe("WebMCP tool definitions", () => {
     ]);
   });
 
+  it("publishes human-readable, unambiguous tool discovery metadata", () => {
+    // This catches an agent-facing catalog that cannot distinguish listing capabilities from evaluating requirements or reading a dossier from changing focus.
+    const byName = Object.fromEntries(createDefinitions().map((tool) => [tool.name, tool]));
+
+    for (const tool of Object.values(byName)) {
+      expect(tool.title).toMatch(/\S/);
+      expect(tool.description).toMatch(/\S/);
+    }
+
+    expect(byName.get_capabilities.description).toMatch(/capabilit/i);
+    expect(byName.get_capabilities.description).toMatch(/catalog|list/i);
+    expect(byName.match_requirements.description).toMatch(/requirement/i);
+    expect(byName.match_requirements.description).toMatch(/match|evaluat/i);
+    expect(byName.get_project.description).toMatch(/dossier|detail/i);
+    expect(byName.focus_project.description).toMatch(/focus|select/i);
+    expect(byName.focus_project.description).toMatch(/workspace/i);
+    expect(byName.focus_project.description).toMatch(/visible|inspect|open/i);
+  });
+
   it("publishes bounded closed input schemas", () => {
     // This catches a schema accepting unbounded or unrecognised arguments before runtime validation runs.
     const byName = Object.fromEntries(createDefinitions().map((tool) => [tool.name, tool]));
@@ -34,9 +53,25 @@ describe("WebMCP tool definitions", () => {
 
     expect(capabilitySchema).toMatchObject({ type: "object", additionalProperties: false, properties: { query: { maxLength: INPUT_LIMITS.queryLength }, limit: { maximum: INPUT_LIMITS.capabilityLimit } } });
     expect(projectsSchema).toMatchObject({ type: "object", additionalProperties: false, properties: { query: { maxLength: INPUT_LIMITS.queryLength }, limit: { maximum: INPUT_LIMITS.projectLimit } } });
+    expect(projectsSchema).toMatchObject({ properties: { capabilityIds: { uniqueItems: true } } });
     expect(projectSchema).toMatchObject({ type: "object", additionalProperties: false, required: ["projectId"], properties: { projectId: { enum: ["bdb", "distribution-desk", "weekfield", "sprintcrm", "storyform", "native-site-control", "presence-os-memory-atlas"] } } });
     expect(matchSchema).toMatchObject({ type: "object", additionalProperties: false, required: ["requirements"], properties: { requirements: { minItems: 1, maxItems: INPUT_LIMITS.requirementCount, items: { minLength: 1, maxLength: INPUT_LIMITS.requirementLength } } } });
     expect(briefSchema).toMatchObject({ type: "object", additionalProperties: false, required: ["projectType", "requirements"], properties: { projectType: { minLength: 1, maxLength: INPUT_LIMITS.projectTypeLength }, context: { maxLength: INPUT_LIMITS.contextLength }, timeline: { maxLength: INPUT_LIMITS.timelineLength }, budget: { maxLength: INPUT_LIMITS.budgetLength } } });
+  });
+
+  it("documents every tool argument, including array entry semantics", () => {
+    // This catches strict schemas becoming opaque to agents that need to choose valid arguments without source-code access.
+    const schemas = createDefinitions().map((tool) => tool.inputSchema as Record<string, unknown>);
+
+    for (const inputSchema of schemas) {
+      const properties = inputSchema.properties as Record<string, Record<string, unknown>>;
+      for (const property of Object.values(properties)) {
+        expect(property.description).toMatch(/\S/);
+        if (property.type === "array") {
+          expect((property.items as Record<string, unknown>).description).toMatch(/\S/);
+        }
+      }
+    }
   });
 
   it("uses portable non-whitespace patterns that accept ASCII and non-Latin input", () => {
@@ -110,5 +145,14 @@ describe("WebMCP tool definitions", () => {
       sourceLabel: "SprintCRM public case",
       sourceReference: "https://brenychstudio.com/work/sprintcrm",
     });
+  });
+
+  it("returns a human-readable public boundary instead of a repository document path", async () => {
+    const byName = Object.fromEntries(createDefinitions().map((tool) => [tool.name, tool]));
+    const result = (await byName.get_profile.execute({}, { signal: new AbortController().signal })) as ToolResult;
+    expect(result).toMatchObject({ ok: true });
+    if (!result.ok) throw new Error("expected a successful profile result");
+    expect(result.data.evidenceBoundary).toMatch(/public evidence|public summar/i);
+    expect(result.data.evidenceBoundary).not.toMatch(/[\\/]|\.md$/i);
   });
 });

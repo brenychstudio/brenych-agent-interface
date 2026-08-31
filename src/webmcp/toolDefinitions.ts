@@ -26,32 +26,45 @@ const nonWhitespacePattern = ".*\\S.*";
 
 const requirementsSchema = {
   type: "array",
+  description: "One or more needs to evaluate against the workspace's public evidence.",
   minItems: 1,
   maxItems: INPUT_LIMITS.requirementCount,
-  items: { type: "string", minLength: 1, maxLength: INPUT_LIMITS.requirementLength, pattern: nonWhitespacePattern },
+  items: {
+    type: "string",
+    description: "A single concrete requirement, such as a technology, workflow, or capability.",
+    minLength: 1,
+    maxLength: INPUT_LIMITS.requirementLength,
+    pattern: nonWhitespacePattern,
+  },
 };
 
 const schema = {
   empty: objectSchema({}),
   capabilities: objectSchema({
-    query: { type: "string", maxLength: INPUT_LIMITS.queryLength },
-    category: { type: "string", enum: capabilityCategories },
-    limit: { type: "integer", minimum: 1, maximum: INPUT_LIMITS.capabilityLimit },
+    query: { type: "string", description: "Optional text to filter the capability catalog.", maxLength: INPUT_LIMITS.queryLength },
+    category: { type: "string", description: "Optional exact capability category to include.", enum: capabilityCategories },
+    limit: { type: "integer", description: "Maximum number of capabilities to return.", minimum: 1, maximum: INPUT_LIMITS.capabilityLimit },
   }),
   projects: objectSchema({
-    query: { type: "string", maxLength: INPUT_LIMITS.queryLength },
-    capabilityIds: { type: "array", maxItems: capabilityIds.length, items: { type: "string", enum: capabilityIds } },
-    maturity: { type: "string", enum: projectMaturities },
-    limit: { type: "integer", minimum: 1, maximum: INPUT_LIMITS.projectLimit },
+    query: { type: "string", description: "Optional text to filter public project summaries.", maxLength: INPUT_LIMITS.queryLength },
+    capabilityIds: {
+      type: "array",
+      description: "Optional capability IDs that every returned project must support.",
+      uniqueItems: true,
+      maxItems: capabilityIds.length,
+      items: { type: "string", description: "One public capability ID required of each project.", enum: capabilityIds },
+    },
+    maturity: { type: "string", description: "Optional exact maturity level for returned projects.", enum: projectMaturities },
+    limit: { type: "integer", description: "Maximum number of project summaries to return.", minimum: 1, maximum: INPUT_LIMITS.projectLimit },
   }),
-  project: objectSchema({ projectId: { type: "string", enum: projectIds } }, ["projectId"]),
+  project: objectSchema({ projectId: { type: "string", description: "The ID of the public project to read or focus.", enum: projectIds } }, ["projectId"]),
   match: objectSchema({ requirements: requirementsSchema }, ["requirements"]),
   brief: objectSchema({
-    projectType: { type: "string", minLength: 1, maxLength: INPUT_LIMITS.projectTypeLength, pattern: nonWhitespacePattern },
+    projectType: { type: "string", description: "A short label for the proposed collaboration or project type.", minLength: 1, maxLength: INPUT_LIMITS.projectTypeLength, pattern: nonWhitespacePattern },
     requirements: requirementsSchema,
-    context: { type: "string", maxLength: INPUT_LIMITS.contextLength },
-    timeline: { type: "string", maxLength: INPUT_LIMITS.timelineLength },
-    budget: { type: "string", maxLength: INPUT_LIMITS.budgetLength },
+    context: { type: "string", description: "Optional local context to include in the editable brief.", maxLength: INPUT_LIMITS.contextLength },
+    timeline: { type: "string", description: "Optional timeline note for the editable brief.", maxLength: INPUT_LIMITS.timelineLength },
+    budget: { type: "string", description: "Optional budget note for the editable brief.", maxLength: INPUT_LIMITS.budgetLength },
   }, ["projectType", "requirements"]),
 } as const;
 
@@ -93,6 +106,7 @@ const compactProjectSummary = (project: ProjectDossier): JsonRecord => ({
   ...(project.publicEvidenceName ? { publicEvidenceName: project.publicEvidenceName } : {}),
   summary: project.summary,
   maturity: project.maturity,
+  maturityLabel: project.maturityLabel,
   visibility: project.visibility,
   capabilityIds: project.capabilities.map((capability) => capability.id),
   links: project.links,
@@ -106,8 +120,10 @@ const compactProjectDossier = (project: ProjectDossier): JsonRecord => ({
   summary: project.summary,
   productType: project.productType,
   maturity: project.maturity,
+  maturityLabel: project.maturityLabel,
   visibility: project.visibility,
   verificationLevels: project.verificationLevels,
+  verifiedHighlights: project.verifiedHighlights,
   capabilities: project.capabilities.map(({ id, label, category }) => ({ id, label, category })),
   evidence: project.evidence.map(({ id, claim, visibility, verificationLevel, sourceLabel, sourceReference }) => ({
     id,
@@ -135,7 +151,8 @@ const execute = (handler: (input: unknown, signal: AbortSignal) => object): WebM
 export const createToolDefinitions = (agent: AgentInterface): readonly WebMcpToolDefinition[] => [
   {
     name: "get_profile",
-    description: "Get the public profile for this local evidence workspace.",
+    title: "Get public profile",
+    description: "Read the public profile for this local evidence workspace.",
     inputSchema: schema.empty,
     annotations: { readOnlyHint: true },
     execute: execute((input) => {
@@ -145,7 +162,8 @@ export const createToolDefinitions = (agent: AgentInterface): readonly WebMcpToo
   },
   {
     name: "get_capabilities",
-    description: "List public evidence-backed capabilities.",
+    title: "List capabilities",
+    description: "List the public capability catalog; use match_requirements to evaluate a supplied set of needs.",
     inputSchema: schema.capabilities,
     annotations: { readOnlyHint: true },
     execute: execute((input) => {
@@ -159,7 +177,8 @@ export const createToolDefinitions = (agent: AgentInterface): readonly WebMcpToo
   },
   {
     name: "list_projects",
-    description: "List public-safe projects matching optional filters.",
+    title: "List public projects",
+    description: "List compact public project summaries that match optional filters.",
     inputSchema: schema.projects,
     annotations: { readOnlyHint: true },
     execute: execute((input) => {
@@ -175,7 +194,8 @@ export const createToolDefinitions = (agent: AgentInterface): readonly WebMcpToo
   },
   {
     name: "get_project",
-    description: "Get a compact public dossier for one project.",
+    title: "Get project dossier",
+    description: "Read the detailed public evidence dossier for one project without changing workspace focus.",
     inputSchema: schema.project,
     annotations: { readOnlyHint: true },
     execute: execute((input) => {
@@ -187,7 +207,8 @@ export const createToolDefinitions = (agent: AgentInterface): readonly WebMcpToo
   },
   {
     name: "match_requirements",
-    description: "Evaluate requirements against local public evidence and update the local match workspace.",
+    title: "Match requirements",
+    description: "Evaluate supplied requirements against local public evidence and update the local match workspace.",
     inputSchema: schema.match,
     annotations: { readOnlyHint: false, untrustedContentHint: true },
     execute: execute((input, signal) => {
@@ -208,7 +229,8 @@ export const createToolDefinitions = (agent: AgentInterface): readonly WebMcpToo
   },
   {
     name: "focus_project",
-    description: "Focus one public project in the local workspace.",
+    title: "Focus project",
+    description: "Visibly focus and open one public project in the shared workspace Inspect surface.",
     inputSchema: schema.project,
     annotations: { readOnlyHint: false },
     execute: execute((input, signal) => {
@@ -221,7 +243,8 @@ export const createToolDefinitions = (agent: AgentInterface): readonly WebMcpToo
   },
   {
     name: "create_collaboration_brief",
-    description: "Create a local collaboration brief from bounded requirements without sending it anywhere.",
+    title: "Create collaboration brief",
+    description: "Create a local editable collaboration brief from bounded requirements without sending it anywhere.",
     inputSchema: schema.brief,
     annotations: { readOnlyHint: false, untrustedContentHint: true },
     execute: execute((input, signal) => {

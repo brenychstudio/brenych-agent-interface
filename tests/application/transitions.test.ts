@@ -102,6 +102,18 @@ describe("semantic application transitions", () => {
     });
   });
 
+  it("keeps integration registration neutral instead of presenting it as an agent tool action", () => {
+    const { app, state } = createApp();
+
+    app.setRegistrationState({ webMcpAvailable: true, registrationState: "ready" }, "webmcp");
+    expect(state.snapshot().currentAgentAction).toBeNull();
+
+    app.matchRequirements({ requirements: ["Electron"] }, "manual");
+    const action = state.snapshot().currentAgentAction;
+    app.setRegistrationState({ webMcpAvailable: true, registrationState: "ready" }, "webmcp");
+    expect(state.snapshot().currentAgentAction).toEqual(action);
+  });
+
   it("returns through the exact inspect and brief history", () => {
     // This catches a close transition that always returns to match or field instead of the true prior mode.
     const { app, state } = createApp();
@@ -180,8 +192,8 @@ describe("semantic application transitions", () => {
     expect(nodeStates).toContainEqual(
       expect.objectContaining({ projectId: "bdb", rank: 1, matchState: "matched" }),
     );
-    expect(nodeStates.find((node) => node.projectId === "bdb")?.transform.z).toBe(0);
-    expect(nodeStates.find((node) => node.projectId === "presence-os-memory-atlas")?.transform.z).toBe(-80);
+    expect(nodeStates.find((node) => node.projectId === "bdb")).toMatchObject({ spatialTier: "dominant", transform: { z: 36, scale: 1.12 } });
+    expect(nodeStates.find((node) => node.projectId === "presence-os-memory-atlas")).toMatchObject({ spatialTier: "receded", transform: { z: -88, scale: 0.8 } });
   });
 
   it("refreshes a stale match atomically before creating a brief and keeps edits local", () => {

@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- Work only in `C:\PROJECTS\brenych-agent-interface`; do not modify source repositories.
+- Work only in the repository root; do not modify source repositories.
 - Keep exactly seven public-safe projects and exactly seven WebMCP tools.
 - Use `document.modelContext`; never reference `navigator.modelContext`.
 - `match_requirements` uses `readOnlyHint: false` and `untrustedContentHint: true`.

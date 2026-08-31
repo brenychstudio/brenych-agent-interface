@@ -26,8 +26,10 @@ export interface ProjectDossier {
   readonly summary: string;
   readonly productType: string;
   readonly maturity: ProjectMaturity;
+  readonly maturityLabel: string;
   readonly visibility: Project["visibility"];
   readonly verificationLevels: Project["verificationLevels"];
+  readonly verifiedHighlights: readonly string[];
   readonly capabilities: readonly Pick<CapabilityDto, "id" | "label" | "category">[];
   readonly evidence: readonly Pick<(typeof evidenceRecords)[number], "id" | "claim" | "visibility" | "verificationLevel" | "sourceLabel" | "sourceReference">[];
   readonly links: Project["links"];
@@ -91,8 +93,10 @@ const toDossier = (project: Project): ProjectDossier => ({
   summary: project.summary,
   productType: project.productType,
   maturity: project.maturity,
+  maturityLabel: project.maturityLabel,
   visibility: project.visibility,
   verificationLevels: project.verificationLevels,
+  verifiedHighlights: project.verifiedHighlights,
   capabilities: project.capabilityIds.map((id) => {
     const capability = capabilityById(id);
     return { id: capability.id, label: capability.label, category: capability.category };

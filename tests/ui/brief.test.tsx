@@ -19,19 +19,24 @@ describe("collaboration brief", () => {
     fireEvent.click(screen.getByRole("button", { name: /Project BDB/ }));
     fireEvent.click(screen.getByRole("button", { name: "CREATE COLLABORATION BRIEF" }));
 
-    expect(screen.getByRole("heading", { name: "PROJECT BRIEF" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "PROJECT BRIEF" })).toHaveFocus();
+    expect(screen.getByText("LOCAL DRAFT ONLY")).toBeInTheDocument();
+    expect(screen.getByText("NO SEND")).toBeInTheDocument();
+    expect(screen.getByText("NO CRM")).toBeInTheDocument();
+    expect(screen.getByText("NO NETWORK WRITE")).toBeInTheDocument();
     expect(screen.getByRole("textbox", { name: "Project type" })).toHaveValue("Desktop agent interface");
     expect(screen.getByRole("textbox", { name: "Requirements" })).toHaveValue("Electron\nMCP\nAI automation\nSupabase");
     expect(screen.getByRole("textbox", { name: "Context" })).toBeInTheDocument();
     expect(screen.getByRole("textbox", { name: "Timeline" })).toBeInTheDocument();
     expect(screen.getByRole("textbox", { name: "Budget" })).toBeInTheDocument();
     expect(screen.getByText("RELEVANT EVIDENCE PROJECTS")).toBeInTheDocument();
-    expect(within(screen.getByRole("region", { name: "RELEVANT EVIDENCE PROJECTS" })).getByText("BDB")).toBeInTheDocument();
+    expect(within(screen.getByRole("region", { name: "RELEVANT EVIDENCE PROJECTS" })).getByText("BDB")).toHaveClass("evidence-chip");
     expect(screen.getByText("KNOWN GAPS")).toBeInTheDocument();
     expect(screen.getByText(/SOURCE MATCH: match-/)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "SUBMIT BRIEF" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "SEND BRIEF" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "BOOK CONSULTATION" })).not.toBeInTheDocument();
+    expect(screen.getByTestId("evidence-field")).toHaveClass("is-receded");
 
     const context = screen.getByRole("textbox", { name: "Context" });
     fireEvent.change(context, { target: { value: "A reviewed local collaboration scope." } });

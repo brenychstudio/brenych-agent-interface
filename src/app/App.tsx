@@ -1,9 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 
 import { agentInterface, resetRuntimeForTesting, toolLifecycle } from "./runtime";
 import { useAppStore } from "../state/appStore";
 import type { ActiveMode } from "../application/StatePort";
-import { selectFocusedProjectContext, selectProjectNodeStates } from "../state/selectors";
+import { selectCapabilityTraces, selectFocusedProjectContext, selectProjectNodeStates } from "../state/selectors";
 import { AppShell } from "../components/AppShell";
 import { RequirementComposer } from "../components/RequirementComposer";
 import { EvidenceField } from "../components/EvidenceField";
@@ -12,6 +12,7 @@ import { AgentActivity } from "../components/AgentActivity";
 import { ResetControl } from "../components/ResetControl";
 import { ProjectEvidenceInspect } from "../components/ProjectEvidenceInspect";
 import { CollaborationBrief } from "../components/CollaborationBrief";
+import { ShowcaseProofLayer } from "../components/ShowcaseProofLayer";
 
 export const resetAppForTesting = (): void => resetRuntimeForTesting();
 
@@ -20,6 +21,7 @@ export const App = () => {
   const nodes = selectProjectNodeStates(state);
   const dossiers = agentInterface.listProjects({ limit: 7 });
   const focus = selectFocusedProjectContext(state);
+  const connections = selectCapabilityTraces(state);
   const previousMode = useRef<ActiveMode>(state.activeMode);
   const originatingNode = useRef<HTMLButtonElement | null>(null);
 
@@ -28,13 +30,20 @@ export const App = () => {
     return () => { void toolLifecycle.stop(); };
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const previous = previousMode.current;
-    if (previous === "inspect" && state.activeMode !== "brief") {
-      const fallback = state.focusedProjectId
-        ? document.querySelector<HTMLButtonElement>(`[data-project-id="${state.focusedProjectId}"]`)
+    const leftIntegratedSurface = (previous === "inspect" || previous === "brief")
+      && state.activeMode !== "inspect"
+      && state.activeMode !== "brief";
+    if (leftIntegratedSurface) {
+      const matchingOrigin = originatingNode.current?.dataset.projectId === state.focusedProjectId
+        ? originatingNode.current
         : null;
-      (originatingNode.current ?? fallback)?.focus();
+      const fallback = state.focusedProjectId
+        ? document.querySelector<HTMLButtonElement>(`button[data-project-id="${state.focusedProjectId}"]`)
+        : null;
+      (matchingOrigin ?? fallback)?.focus();
+      originatingNode.current = null;
     }
     previousMode.current = state.activeMode;
   }, [state.activeMode, state.focusedProjectId]);
@@ -64,13 +73,16 @@ export const App = () => {
 
   return (
     <AppShell registrationState={state.registrationState}>
-      <div className="workspace-layout">
-        <RequirementComposer agent={agentInterface} requirements={state.requirements} resetGeneration={state.resetGeneration} />
-        <EvidenceField agent={agentInterface} dossiers={dossiers} nodes={nodes} receded={state.activeMode === "inspect" || state.activeMode === "brief"} inspectedProjectId={inspectedProjectId} onProjectFocus={(node) => { originatingNode.current = node; }} />
-        {state.matchResult ? <MatchPanel result={state.matchResult} dossiers={dossiers} /> : null}
+      <div className={`experience experience--${state.activeMode}`}>
+        <div className={`workspace-layout workspace-layout--${state.activeMode}`}>
+          <RequirementComposer agent={agentInterface} requirements={state.requirements} resetGeneration={state.resetGeneration} />
+          <EvidenceField agent={agentInterface} dossiers={dossiers} nodes={nodes} connections={connections} action={state.currentAgentAction} receded={state.activeMode === "inspect" || state.activeMode === "brief"} inspectedProjectId={inspectedProjectId} onProjectFocus={(node) => { originatingNode.current = node; }} />
+          {state.matchResult ? <MatchPanel result={state.matchResult} dossiers={dossiers} /> : null}
+        </div>
+        {state.activeMode === "inspect" && focusedDossier && focus ? <ProjectEvidenceInspect agent={agentInterface} dossier={focusedDossier} focus={focus} match={state.matchResult} /> : null}
+        {state.activeMode === "brief" && state.collaborationDraft ? <CollaborationBrief agent={agentInterface} brief={state.collaborationDraft} relevantProjects={relevantProjects} /> : null}
+        <ShowcaseProofLayer quiet={state.activeMode !== "field"} />
       </div>
-      {state.activeMode === "inspect" && focusedDossier && focus ? <ProjectEvidenceInspect agent={agentInterface} dossier={focusedDossier} focus={focus} match={state.matchResult} /> : null}
-      {state.activeMode === "brief" && state.collaborationDraft ? <CollaborationBrief agent={agentInterface} brief={state.collaborationDraft} relevantProjects={relevantProjects} /> : null}
       <footer className="workspace-footer">
         <AgentActivity action={state.currentAgentAction} />
         <ResetControl agent={agentInterface} />
