@@ -304,11 +304,11 @@ describe("public repository boundary", () => {
     ]);
   });
 
-  it("allows only the 15 registered WebPs and five reviewed JPEG release captures as binaries", () => {
+  it("allows only the 18 registered WebPs and five reviewed JPEG release captures as binaries", () => {
     const sources = publicSources();
     const binaryPaths = new Set(sources.filter(({ bytes }) => bytes.includes(0)).map(({ path }) => path));
 
-    expect(registeredPublicWebpPaths.size).toBe(15);
+    expect(registeredPublicWebpPaths.size).toBe(18);
     expect([...registeredPublicWebpPaths].every((path) => /^public\/evidence\/.+\.webp$/u.test(path))).toBe(true);
     expect(reviewedReleaseCapturePaths.size).toBe(5);
     expect(binaryPaths).toEqual(approvedBinaryPaths);

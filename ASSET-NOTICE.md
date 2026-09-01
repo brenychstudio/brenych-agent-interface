@@ -2,7 +2,13 @@
 
 The software source in this repository is provided under the [Apache License 2.0](LICENSE).
 
-The evidence screenshots in `public/evidence/` are user-approved Brenych Studio demonstration assets included so the WebMCP Challenge application remains functional and independently testable. They are reviewed derivatives of source screenshots; the original source files are not included. Their review and provenance are recorded in [`docs/EVIDENCE-MEDIA-MANIFEST.md`](docs/EVIDENCE-MEDIA-MANIFEST.md).
+The 18 evidence screenshots in `public/evidence/` are user-approved Brenych Studio demonstration assets included so the WebMCP Challenge application remains functional and independently testable. They are reviewed derivatives of source screenshots; the original source files are not included. Their review and provenance are recorded in [`docs/EVIDENCE-MEDIA-MANIFEST.md`](docs/EVIDENCE-MEDIA-MANIFEST.md).
+
+The three screenshots added in this release are:
+
+- `public/evidence/presence-os-memory-atlas/presence-os-memory-field.webp`
+- `public/evidence/presence-os-memory-atlas/presence-os-spatial-inspect.webp`
+- `public/evidence/sprintcrm/sprintcrm-workspace.webp`
 
 The four JPEGs in `docs/submission/images/` and `public/social-preview.jpg` are captures of this application using only that approved evidence set. They are included solely as challenge submission and link-preview material and inherit the same evidence, trademark, and privacy boundaries.
 

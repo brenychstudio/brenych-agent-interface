@@ -63,6 +63,8 @@ export const ProjectNode = ({
       data-visual-form={node.visualForm}
       data-proximity={proximity}
       data-media-kind={node.visualForm === "extended-signal" ? "signal" : primaryMedia ? "screenshot" : "typographic"}
+      data-inspection-state={inspectionState ?? "idle"}
+      data-entry-layout-id={`project-evidence-${dossier.id}`}
       style={style}
       layoutId={`project-evidence-${dossier.id}`}
       initial={false}
@@ -100,7 +102,12 @@ export const ProjectNode = ({
       ) : (
         <span className="node-typographic-evidence">
           <span className="node-sigil" aria-hidden="true">{dossier.title.slice(0, 2).toUpperCase()}</span>
-          <span>TYPE-LED EVIDENCE</span>
+          {dossier.id === "native-site-control" ? (
+            <>
+              <span>ARCHITECTURE FOUNDATION</span>
+              <span>PUBLIC UI NOT YET AVAILABLE</span>
+            </>
+          ) : <span>TYPE-LED EVIDENCE</span>}
         </span>
       )}
       {node.visualForm === "evidence-object" ? (

@@ -1,0 +1,173 @@
+/* Quiet editorial full-viewport evidence viewer. The screenshot dominates; chrome stays small. */
+.media-inspect {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  overscroll-behavior: contain;
+  background: color-mix(in srgb, var(--stage-deep) 94%, transparent);
+  color: var(--stage-ink);
+}
+
+.media-inspect-dialog {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  width: 100%;
+  height: 100dvh;
+  padding: clamp(.85rem, 2vw, 1.9rem);
+  gap: clamp(.7rem, 1.6vw, 1.4rem);
+}
+
+.media-inspect-chrome,
+.media-inspect-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.media-inspect-identity { min-width: 0; }
+.media-inspect-eyebrow {
+  margin: 0;
+  color: var(--stage-muted);
+  font: 600 .58rem/1.3 var(--mono);
+  letter-spacing: .12em;
+}
+.media-inspect-dialog h2 {
+  margin: .3rem 0 0;
+  font-size: clamp(1.5rem, 3.4vw, 2.9rem);
+  font-weight: 520;
+  line-height: .9;
+  letter-spacing: -.055em;
+}
+
+.media-inspect-control {
+  flex: none;
+  border: 1px solid var(--stage-line-strong);
+  background: transparent;
+  color: inherit;
+  padding: .55rem .8rem;
+  font: 600 .6rem var(--mono);
+  letter-spacing: .1em;
+}
+.media-inspect-control:hover { background: var(--stage-ink); color: var(--stage-deep); }
+.media-inspect-control:focus-visible { outline: 2px solid var(--stage-ink); outline-offset: 3px; }
+
+.media-inspect-stage {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-rows: minmax(0, 1fr);
+  align-items: stretch;
+  gap: clamp(.5rem, 1.5vw, 1.2rem);
+  min-height: 0;
+}
+
+.media-inspect-step { align-self: center; }
+
+.media-inspect-figure {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  border: 1px solid var(--stage-line);
+  background: var(--stage-panel);
+}
+
+/* Interface evidence is never cropped: the complete screenshot is always visible. */
+.media-inspect-figure img {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  min-width: 0;
+  min-height: 0;
+  object-fit: contain;
+  object-position: center;
+}
+
+.media-inspect-copy { min-width: 0; }
+.media-inspect-caption {
+  margin: 0;
+  font-size: clamp(.82rem, 1.5vw, 1rem);
+  line-height: 1.35;
+}
+.media-inspect-role,
+.media-inspect-count {
+  margin: .3rem 0 0;
+  color: var(--stage-muted);
+  font: 600 .58rem var(--mono);
+  letter-spacing: .1em;
+}
+.media-inspect-count { flex: none; margin: 0; }
+
+.media-inspect-live {
+  flex: none;
+  border: 1px solid var(--stage-ink);
+  padding: .55rem .8rem;
+  color: inherit;
+  font: 600 .6rem var(--mono);
+  letter-spacing: .1em;
+  text-decoration: none;
+}
+.media-inspect-live:hover { background: var(--stage-ink); color: var(--stage-deep); }
+
+@media (max-width: 620px) {
+  .media-inspect-stage {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "media media"
+      "prev next";
+  }
+  .media-inspect-figure { grid-area: media; }
+  .media-inspect-step:first-child { grid-area: prev; justify-self: start; }
+  .media-inspect-step:last-child { grid-area: next; justify-self: end; }
+  .media-inspect-meta { flex-wrap: wrap; align-items: flex-start; }
+}
+
+@media (max-height: 520px) {
+  .media-inspect-dialog h2 { font-size: 1.25rem; }
+  .media-inspect-eyebrow { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .media-inspect,
+  .media-inspect * { transition: none !important; animation: none !important; }
+}
+
+/* Shared viewer trigger: the screenshot itself is the control, chrome stays quiet until hover/focus. */
+.media-open {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  text-align: left;
+}
+.media-open img { display: block; width: 100%; }
+.media-open-label {
+  position: absolute;
+  right: .5rem;
+  bottom: .5rem;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  padding: .38rem .55rem;
+  font: 600 .56rem var(--mono);
+  letter-spacing: .08em;
+  opacity: 0;
+  transition: opacity .18s ease;
+}
+.media-open:hover .media-open-label,
+.media-open:focus-visible .media-open-label { opacity: 1; }
+.media-open:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+.showcase-frame .media-open { height: 100%; }
+
+@media (prefers-reduced-motion: reduce) {
+  .media-open-label { transition: none; }
+}

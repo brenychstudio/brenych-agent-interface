@@ -7,8 +7,12 @@ export interface ShowcaseProof {
   readonly title: string;
   readonly role: string;
   readonly summary: string;
-  readonly mediaIds: readonly EvidenceMediaId[];
+  readonly mediaIds: readonly [EvidenceMediaId, EvidenceMediaId];
+  /** Presentation-only chapter labels. These never reach capability matching. */
+  readonly capabilityLabels: readonly [string, string, string];
   readonly relatedCapabilityIds: readonly CapabilityId[];
+  /** Present only for an independently verified public destination. */
+  readonly liveUrl?: string;
   readonly scoring: false;
 }
 
@@ -27,7 +31,10 @@ export type EvidenceMediaId =
   | "webhero-living-environments"
   | "webhero-metamorph-bubbles"
   | "weekfield-smart-mix"
-  | "weekfield-planet-field";
+  | "weekfield-planet-field"
+  | "presence-os-memory-field"
+  | "presence-os-spatial-inspect"
+  | "sprintcrm-workspace";
 
 export interface EvidenceMedia {
   readonly id: EvidenceMediaId;

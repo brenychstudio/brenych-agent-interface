@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { readFileSync } from "node:fs";
 import { afterEach, describe, expect, it } from "vitest";
 
@@ -6,8 +6,6 @@ import { App, resetAppForTesting } from "../../src/app/App";
 
 const shellCss = readFileSync("src/styles/shell.css", "utf8");
 const evidenceFieldCss = readFileSync("src/styles/evidence-field.css", "utf8");
-const experienceStageCss = readFileSync("src/styles/experience-stage.css", "utf8");
-const briefCss = readFileSync("src/styles/brief.css", "utf8");
 
 const setViewport = (width: number): void => {
   Object.defineProperty(window, "innerWidth", { configurable: true, value: width });
@@ -21,7 +19,7 @@ afterEach(() => {
 });
 
 describe("responsive structural contracts", () => {
-  it.each([390, 430, 768, 1024, 1366])("keeps the challenge evidence workspace functional at %ipx", (viewport) => {
+  it.each([390, 430, 768, 1024, 1366, 1920])("keeps the challenge evidence workspace functional at %ipx", (viewport) => {
     // This catches a responsive branch that hides or disconnects a core workflow control at a supported viewport.
     setViewport(viewport);
     render(<App />);
@@ -41,7 +39,8 @@ describe("responsive structural contracts", () => {
 
     bdb.focus();
     fireEvent.keyDown(bdb, { key: "Enter" });
-    expect(screen.getByRole("heading", { name: "SELECTED EVIDENCE" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "BDB", level: 2 })).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "BDB evidence inspect" })).toHaveAttribute("data-scroll-owner", "document");
     expect(screen.getByRole("button", { name: "BACK TO EVIDENCE" })).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "CREATE COLLABORATION BRIEF" }));
@@ -78,12 +77,21 @@ describe("responsive structural contracts", () => {
     expect(mobileRule).toMatch(/\.experience--inspect \.match-panel,[\s\S]*\.experience--brief \.match-panel \{ display: none; \}/);
   });
 
-  it("bounds foreground modes to one viewport-stage while preserving natural mobile Brief scroll", () => {
-    expect(experienceStageCss).toMatch(/\.experience-stage--inspect,[\s\S]*\.experience-stage--brief \{[^}]*min-height: calc\(100dvh - 6\.5rem\)/);
-    expect(experienceStageCss).toMatch(/\.stage-workspace--inspect,[\s\S]*\.stage-workspace--brief \{[^}]*position: absolute;[^}]*inset: 0;[^}]*overflow: hidden/);
-    const briefMobileRule = briefCss.match(/@media \(max-width: 620px\)[\s\S]*$/)?.[0] ?? "";
-    expect(briefMobileRule).toMatch(/\.brief-surface \{[^}]*max-height: none;[^}]*overflow: visible/);
-    expect(briefCss).toMatch(/\.brief-return \{[^}]*position: sticky;[^}]*top: 0;[^}]*z-index:/);
+  it("exposes document scroll ownership without a nested scroll-region tab stop", () => {
+    // This catches either foreground surface becoming a separately focusable vertical scroll container.
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Add Electron" }));
+    fireEvent.click(screen.getByRole("button", { name: "EVALUATE EVIDENCE" }));
+    fireEvent.click(screen.getByRole("button", { name: /Project BDB/ }));
+
+    const inspect = screen.getByRole("region", { name: "BDB evidence inspect" });
+    expect(inspect).toHaveAttribute("data-scroll-owner", "document");
+    expect(inspect).not.toHaveAttribute("tabindex");
+
+    fireEvent.click(screen.getByRole("button", { name: "CREATE COLLABORATION BRIEF" }));
+    const brief = screen.getByRole("region", { name: "PROJECT BRIEF" });
+    expect(brief).toHaveAttribute("data-scroll-owner", "document");
+    expect(brief).not.toHaveAttribute("tabindex");
   });
 
   it("reserves enough desktop stage depth for the seventh project and gives dark nodes a contrasting focus ring", () => {
@@ -104,7 +112,9 @@ describe("responsive structural contracts", () => {
     fireEvent.click(screen.getByRole("button", { name: "Add MCP" }));
     fireEvent.click(screen.getByRole("button", { name: "EVALUATE EVIDENCE" }));
 
-    const bottomRowY = screen.getAllByRole("button", { name: /Project .*rank [4-7]/i })
+    const camera = screen.getByTestId("evidence-field").querySelector<HTMLElement>(".field-camera");
+    if (!camera) throw new Error("field camera is missing");
+    const bottomRowY = within(camera).getAllByRole("button", { name: /Project .*rank [4-7]/i })
       .map((node) => Number.parseFloat(node.style.getPropertyValue("--node-y")));
     expect(Math.max(...bottomRowY)).toBeLessThanOrEqual(61);
   });

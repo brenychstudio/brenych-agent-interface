@@ -70,6 +70,48 @@
 .field-action strong { color: var(--stage-accent); }
 .field-media-boundary { font-size: .5rem; letter-spacing: .04em; }
 
+.evidence-index {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 60;
+  width: min(24rem, calc(100% - 2rem));
+  border: 1px solid var(--stage-line-strong);
+  background: color-mix(in srgb, var(--stage-panel) 96%, transparent);
+  color: var(--stage-ink);
+}
+
+.evidence-index summary {
+  cursor: pointer;
+  padding: .75rem;
+  font: 600 .62rem var(--mono);
+  letter-spacing: .09em;
+}
+
+.evidence-index > p {
+  margin: 0;
+  border-top: 1px solid var(--stage-line);
+  padding: .55rem .75rem;
+  color: var(--stage-muted);
+  font: .55rem var(--mono);
+  letter-spacing: .07em;
+}
+
+.evidence-index-list { display: grid; }
+.evidence-index-list button {
+  display: flex;
+  justify-content: space-between;
+  gap: .75rem;
+  border: 0;
+  border-top: 1px solid var(--stage-line);
+  background: transparent;
+  color: inherit;
+  padding: .55rem .75rem;
+  text-align: left;
+}
+.evidence-index-list button:hover { background: color-mix(in srgb, var(--stage-accent) 12%, transparent); }
+.evidence-index-list button span:last-child { color: var(--stage-accent); font: .52rem var(--mono); letter-spacing: .06em; }
+
 .project-node {
   position: absolute;
   left: var(--node-x);
@@ -269,6 +311,7 @@
   .project-node[data-spatial-tier="dominant"] { grid-column: 1 / -1; }
   .project-node[data-visual-form="extended-signal"] { width: 100%; min-height: 7rem; align-self: stretch; }
   .field-camera { position: static; display: contents; transform: none !important; }
+  .evidence-index { position: relative; right: auto; bottom: auto; grid-column: 1 / -1; width: 100%; order: 100; }
   .field-grid,
   .capability-connections { transform: none; }
   .project-node:hover,

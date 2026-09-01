@@ -16,36 +16,70 @@
 .showcase-proof:nth-child(even) { grid-template-columns: minmax(14rem, .55fr) minmax(0, 1.55fr); }
 .showcase-proof:nth-child(even) .showcase-media { grid-column: 2; }
 .showcase-proof:nth-child(even) .showcase-copy { grid-column: 1; grid-row: 1; }
-.showcase-media { position: relative; min-height: clamp(22rem, 45vw, 46rem); }
-.showcase-frame { position: absolute; margin: 0; overflow: hidden; border: 1px solid var(--line); background: var(--paper-deep); }
-.showcase-frame img { display: block; width: 100%; height: 100%; object-fit: cover; }
+/* Two overlapping planes that scroll at slightly different rates; the copy stays the fixed anchor. */
+.showcase-media { position: relative; padding-bottom: 6%; }
+.showcase-frame { margin: 0; border: 1px solid var(--line); background: var(--paper-deep); }
+/* Showcase screenshots are complete interface evidence: never cropped, never forced to a ratio. */
+.showcase-frame img { display: block; width: 100%; height: auto; object-fit: contain; object-position: center; }
 .showcase-frame figcaption { padding: .5rem .65rem; color: var(--muted); font: .58rem/1.4 var(--mono); letter-spacing: .05em; text-transform: uppercase; }
-.showcase-frame--primary { inset: 0 11% 11% 0; }
-.showcase-frame--secondary { right: 0; bottom: 0; width: 36%; box-shadow: -1rem -1rem 0 var(--paper); }
+.showcase-frame--primary { width: 89%; }
+.showcase-frame--secondary {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 36%;
+  box-shadow: -1rem -1rem 0 var(--paper);
+}
 .showcase-copy { padding-bottom: 1rem; }
+.showcase-summary { max-width: 33rem; margin: 1rem 0 0; color: var(--muted); font-size: .88rem; line-height: 1.55; }
+.showcase-capabilities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .45rem;
+  margin: 1.2rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.showcase-capabilities li {
+  border: 1px solid var(--line);
+  padding: .42rem .6rem;
+  font: 600 .58rem var(--mono);
+  letter-spacing: .08em;
+}
+.showcase-live-link {
+  display: inline-block;
+  margin-top: 1.2rem;
+  border: 1px solid var(--ink);
+  padding: .6rem .78rem;
+  color: inherit;
+  font: 600 .62rem var(--mono);
+  letter-spacing: .07em;
+  text-decoration: none;
+}
+.showcase-live-link:hover { background: var(--ink); color: var(--paper); }
 .showcase-index { color: var(--muted); font: .62rem var(--mono); }
 .showcase-copy h3 { margin: 1rem 0 .45rem; font-size: clamp(2rem, 4vw, 4.2rem); font-weight: 520; line-height: .88; letter-spacing: -.06em; }
 .showcase-role { max-width: 24rem; font: 600 .68rem/1.45 var(--mono); letter-spacing: .05em; text-transform: uppercase; }
-.showcase-copy > p:last-child { max-width: 33rem; color: var(--muted); font-size: .88rem; line-height: 1.55; }
+
 
 @media (max-width: 900px) {
   .showcase-proof,
   .showcase-proof:nth-child(even) { grid-template-columns: 1fr; }
   .showcase-proof:nth-child(even) .showcase-media,
   .showcase-proof:nth-child(even) .showcase-copy { grid-column: 1; grid-row: auto; }
-  .showcase-media { min-height: 34rem; }
 }
 
 @media (max-width: 620px) {
   .showcase-header { align-items: flex-start; flex-direction: column; }
-  .showcase-media { min-height: auto; display: grid; gap: .65rem; }
+  .showcase-media { display: grid; gap: .65rem; padding-bottom: 0; }
   .showcase-frame,
   .showcase-frame--primary,
   .showcase-frame--secondary { position: static; width: 100%; box-shadow: none; }
-  .showcase-frame img { aspect-ratio: 16 / 10; object-fit: cover; }
   .showcase-copy h3 { font-size: 2.8rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .showcase-layer { transition: none; }
+  .showcase-layer,
+  .showcase-frame { transition: none; }
+  .showcase-frame { transform: none !important; opacity: 1 !important; }
 }

@@ -19,7 +19,11 @@ describe("collaboration brief", () => {
     fireEvent.click(screen.getByRole("button", { name: /Project BDB/ }));
     fireEvent.click(screen.getByRole("button", { name: "CREATE COLLABORATION BRIEF" }));
 
+    const briefSurface = screen.getByRole("region", { name: "PROJECT BRIEF" });
     expect(screen.getByRole("heading", { name: "PROJECT BRIEF" })).toHaveFocus();
+    expect(briefSurface).toHaveAttribute("data-scroll-owner", "document");
+    expect(briefSurface).not.toHaveAttribute("role");
+    expect(briefSurface).not.toHaveAttribute("tabindex");
     expect(screen.getByText("PAGE-LOCAL DRAFT ONLY")).toBeInTheDocument();
     expect(screen.getByText("NO SEND")).toBeInTheDocument();
     expect(screen.getByText("NO CRM")).toBeInTheDocument();
@@ -51,7 +55,7 @@ describe("collaboration brief", () => {
     expect(await screen.findByText("Brief copied to clipboard.")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "BACK TO EVIDENCE" }));
-    expect(screen.getByRole("heading", { name: "SELECTED EVIDENCE" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "BDB", level: 2 })).toBeInTheDocument();
   });
 
   it("rejects an over-limit requirements edit without silently changing the source match", () => {

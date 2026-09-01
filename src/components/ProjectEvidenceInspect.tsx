@@ -9,24 +9,49 @@ import {
   verificationLevelLabel,
 } from "../presentation/displayLabels";
 import { mediaForOwner } from "../presentation/evidenceMedia";
+import { projectLiveUrl } from "../presentation/projectLinks";
+import { SAFE_EXTERNAL_REL } from "../presentation/publicDestinations";
 import type { FocusedProjectContext } from "../state/selectors";
+import type { MediaInspectRequest } from "./CinematicMediaInspect";
+
+const nativeSiteControlFoundation = [
+  "typed site contracts",
+  "site manifest",
+  "revision model",
+  "validation and apply boundaries",
+  "repository provider boundary",
+  "deployment provider boundary",
+] as const;
 
 export const ProjectEvidenceInspect = ({
   agent,
   dossier,
   focus,
   match,
+  onMediaInspect,
 }: {
   readonly agent: AgentInterface;
   readonly dossier: ProjectDossier;
   readonly focus: FocusedProjectContext;
   readonly match: MatchResult | null;
+  readonly onMediaInspect?: (request: MediaInspectRequest) => void;
 }) => {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const [error, setError] = useState<string | null>(null);
-  const media = mediaForOwner(dossier.id).slice(0, 2);
+  const media = mediaForOwner(dossier.id);
+  const liveUrl = projectLiveUrl(dossier.links);
+  const rank = match
+    ? match.rankedProjects.findIndex((ranked) => ranked.projectId === dossier.id) + 1
+    : 0;
+  // Presentation-only kicker. The project name remains the dominant heading of the surface.
+  const kicker = rank > 0
+    ? `${String(rank).padStart(2, "0")} / SELECTED EVIDENCE`
+    : "SELECTED / DETERMINISTIC EVIDENCE";
+  const evidenceVisibilitySummary = [
+    ...new Set(dossier.evidence.map((evidence) => evidenceVisibilityLabel(evidence.visibility))),
+  ].join(", ") || "NOT REPRESENTED";
 
-  useEffect(() => { headingRef.current?.focus({ preventScroll: true }); }, []);
+  useEffect(() => { headingRef.current?.focus(); }, []);
 
   const createBrief = (): void => {
     if (!match) return;
@@ -42,68 +67,56 @@ export const ProjectEvidenceInspect = ({
   };
 
   return (
-    <section className="inspect-surface" data-surface="integrated-shell" aria-labelledby="inspect-heading">
-      <div className="inspect-header">
-        <div>
-          <p className="eyebrow">PROJECT EVIDENCE INSPECT</p>
-          <p className="inspect-project">{dossier.title}</p>
-        </div>
-        <button type="button" className="surface-return" onClick={() => agent.close("manual")}>BACK TO EVIDENCE</button>
+    <section
+      className="inspect-surface"
+      data-surface="integrated-shell"
+      data-scroll-owner="document"
+      aria-label={`${dossier.title} evidence inspect`}
+    >
+      <button type="button" className="surface-return inspect-return" onClick={() => agent.close("manual")}>BACK TO EVIDENCE</button>
+
+      <div className="inspect-zone inspect-zone--identity" data-inspect-zone="identity">
+        <p className="inspect-selection">{kicker}</p>
+        <h2 id="inspect-heading" tabIndex={-1} ref={headingRef}>{dossier.title}</h2>
+        <p className="inspect-product-type">{dossier.productType}</p>
       </div>
 
-      <div className="inspect-hero">
-        <div className="inspect-narrative">
-          <div className="inspect-title-block">
-            <p className="inspect-selection">SELECTED / DETERMINISTIC EVIDENCE</p>
-            <h2 id="inspect-heading" tabIndex={-1} ref={headingRef}>SELECTED EVIDENCE</h2>
-            <p>{dossier.productType}</p>
-          </div>
-          <section className="inspect-section" aria-labelledby="project-is-heading">
-            <h3 id="project-is-heading">WHAT THIS PROJECT IS</h3>
-            <p className="inspect-summary">{dossier.summary}</p>
-          </section>
-          <section className="inspect-section" aria-labelledby="why-selected-heading">
-            <h3 id="why-selected-heading">WHY IT WAS SELECTED</h3>
-            <p>{match
-              ? focus.reason
-              : "Opened manually. Evaluate requirements to see evidence-backed relevance."}</p>
-          </section>
-          {match && focus.matchedRequirements.length > 0 ? (
-            <section className="inspect-section" aria-labelledby="matched-requirements-heading" aria-label="MATCHED REQUIREMENTS">
-              <h3 id="matched-requirements-heading">MATCHED REQUIREMENTS</h3>
-              <ul className="inspect-chips">{focus.matchedRequirements.map((requirement) => <li key={requirement}>{requirement}</li>)}</ul>
-            </section>
-          ) : null}
-          {match && focus.partialRequirements.length > 0 ? (
-            <section className="inspect-section" aria-labelledby="partial-requirements-heading" aria-label="PARTIAL / RELATED EVIDENCE">
-              <h3 id="partial-requirements-heading">PARTIAL / RELATED EVIDENCE</h3>
-              <ul className="inspect-chips">{focus.partialRequirements.map((requirement) => <li key={requirement}>{requirement}</li>)}</ul>
-            </section>
-          ) : null}
-          <section className="inspect-section" aria-labelledby="highlights-heading" aria-label="VERIFIED HIGHLIGHTS">
-            <h3 id="highlights-heading">VERIFIED HIGHLIGHTS</h3>
-            <ul className="verified-highlights">
-              {dossier.verifiedHighlights.map((highlight) => <li key={highlight}>{highlight}</li>)}
-            </ul>
-          </section>
-        </div>
-
+      <div className="inspect-zone inspect-zone--media" data-inspect-zone="media">
         {media.length > 0 ? (
           <div className="inspect-media" role="region" aria-label={`${dossier.title} evidence media`}>
             {media.map((item, index) => (
               <motion.figure
                 key={item.id}
                 className={`inspect-media-frame inspect-media-frame--${item.role}`}
+                data-fit="contain"
+                data-entry-layout-id={index === 0 ? `project-evidence-${dossier.id}` : undefined}
                 layoutId={index === 0 ? `project-evidence-${dossier.id}` : undefined}
               >
-                <img
-                  src={item.src}
-                  alt={item.alt}
-                  width={item.width}
-                  height={item.height}
-                  loading={index === 0 ? "eager" : "lazy"}
-                  decoding="async"
-                />
+                <button
+                  type="button"
+                  className="media-open"
+                  data-layout-id={`media-inspect-${item.id}`}
+                  aria-label={`VIEW FULL INTERFACE ↗ — ${item.caption}`}
+                  onClick={(event) => onMediaInspect?.({
+                    title: dossier.title,
+                    media,
+                    activeId: item.id,
+                    origin: event.currentTarget,
+                    liveUrl,
+                  })}
+                >
+                  <img
+                    src={item.src}
+                    alt={item.alt}
+                    width={item.width}
+                    height={item.height}
+                    data-fit="contain"
+                    style={{ aspectRatio: `${item.width} / ${item.height}` }}
+                    loading={index === 0 ? "eager" : "lazy"}
+                    decoding="async"
+                  />
+                  <span className="media-open-label" aria-hidden="true">VIEW FULL INTERFACE ↗</span>
+                </button>
                 <figcaption>
                   <span>{item.caption}</span>
                   <small>USER-APPROVED VISUAL EVIDENCE · TECHNICAL CLAIMS VERIFIED SEPARATELY</small>
@@ -112,29 +125,90 @@ export const ProjectEvidenceInspect = ({
             ))}
           </div>
         ) : (
-          <motion.div className="inspect-type-frame" layoutId={`project-evidence-${dossier.id}`} aria-label={`${dossier.title} type-led evidence`}>
+          <motion.div
+            className="inspect-type-frame"
+            data-entry-layout-id={`project-evidence-${dossier.id}`}
+            layoutId={`project-evidence-${dossier.id}`}
+            aria-label={`${dossier.title} type-led evidence`}
+          >
             <span aria-hidden="true">{dossier.title.slice(0, 2).toUpperCase()}</span>
-            <p>TYPE-LED EVIDENCE / NO SCREENSHOT CLAIMED</p>
+            {dossier.id === "native-site-control" ? (
+              <>
+                <p>ARCHITECTURE FOUNDATION</p>
+                <p>PUBLIC UI NOT YET AVAILABLE</p>
+              </>
+            ) : <p>TYPE-LED EVIDENCE / NO SCREENSHOT CLAIMED</p>}
           </motion.div>
         )}
-
-        <aside className="inspect-evidence-rail" aria-label="Evidence provenance">
-          <dl className="inspect-facts">
-            <div><dt>PRODUCT</dt><dd>{dossier.productType}</dd></div>
-            <div><dt>MATURITY</dt><dd>{dossier.maturityLabel}</dd></div>
-            <div><dt>VERIFICATION</dt><dd>{dossier.verificationLevels.map(verificationLevelLabel).join(", ")}</dd></div>
-          </dl>
-          <section className="inspect-section inspect-boundary" aria-labelledby="public-boundary-heading">
-            <h3 id="public-boundary-heading">PUBLIC / PRIVATE BOUNDARY</h3>
-            <p className="boundary-label">{projectVisibilityLabel(dossier.visibility)}</p>
-            {dossier.links.length > 0 ? (
-              <ul className="public-links">
-                {dossier.links.map((link) => <li key={link.href}><a href={link.href}>{link.label}</a></li>)}
-              </ul>
-            ) : <p>No public link is represented for this evidence record.</p>}
-          </section>
-        </aside>
       </div>
+
+      <div className="inspect-zone inspect-zone--summary" data-inspect-zone="summary" data-line-length="summary">
+        <section className="inspect-section" aria-labelledby="project-is-heading">
+          <h3 id="project-is-heading">WHAT THIS PROJECT IS</h3>
+          <p className="inspect-summary">{dossier.summary}</p>
+        </section>
+        <section className="inspect-section" aria-labelledby="why-selected-heading">
+          <h3 id="why-selected-heading">WHY IT WAS SELECTED</h3>
+          <p>{match
+            ? focus.reason
+            : "Opened manually. Evaluate requirements to see evidence-backed relevance."}</p>
+        </section>
+        {dossier.id === "native-site-control" ? (
+          <section className="inspect-section inspect-foundation" aria-label="ARCHITECTURE FOUNDATION">
+            <ul>
+              {nativeSiteControlFoundation.map((item) => <li key={item}>{item}</li>)}
+            </ul>
+          </section>
+        ) : null}
+        {match && focus.matchedRequirements.length > 0 ? (
+          <section className="inspect-section" aria-labelledby="matched-requirements-heading" aria-label="MATCHED REQUIREMENTS">
+            <h3 id="matched-requirements-heading">MATCHED REQUIREMENTS</h3>
+            <ul className="inspect-chips">{focus.matchedRequirements.map((requirement) => <li key={requirement}>{requirement}</li>)}</ul>
+          </section>
+        ) : null}
+        {match && focus.partialRequirements.length > 0 ? (
+          <section className="inspect-section" aria-labelledby="partial-requirements-heading" aria-label="PARTIAL / RELATED EVIDENCE">
+            <h3 id="partial-requirements-heading">PARTIAL / RELATED EVIDENCE</h3>
+            <ul className="inspect-chips">{focus.partialRequirements.map((requirement) => <li key={requirement}>{requirement}</li>)}</ul>
+          </section>
+        ) : null}
+        <section className="inspect-section" aria-labelledby="highlights-heading" aria-label="VERIFIED HIGHLIGHTS">
+          <h3 id="highlights-heading">VERIFIED HIGHLIGHTS</h3>
+          <ul className="verified-highlights">
+            {dossier.verifiedHighlights.map((highlight) => <li key={highlight}>{highlight}</li>)}
+          </ul>
+        </section>
+      </div>
+
+      <aside className="inspect-zone inspect-evidence-rail" data-inspect-zone="rail" aria-label="Evidence provenance">
+        <dl className="inspect-facts">
+          <div><dt>PRODUCT</dt><dd>{dossier.productType}</dd></div>
+          <div><dt>MATURITY</dt><dd>{dossier.maturityLabel}</dd></div>
+          <div><dt>VERIFICATION</dt><dd>{dossier.verificationLevels.map(verificationLevelLabel).join(", ")}</dd></div>
+          <div><dt>EVIDENCE VISIBILITY</dt><dd>{evidenceVisibilitySummary}</dd></div>
+        </dl>
+        <section className="inspect-section inspect-boundary" aria-labelledby="public-boundary-heading">
+          <h3 id="public-boundary-heading">PUBLIC / PRIVATE BOUNDARY</h3>
+          <p className="boundary-label">{projectVisibilityLabel(dossier.visibility)}</p>
+          {dossier.links.length > 0 ? (
+            <ul className="public-links">
+              {dossier.links.map((link) => (
+                <li key={link.href}>
+                  <a href={link.href} target="_blank" rel={SAFE_EXTERNAL_REL}>{link.label}</a>
+                </li>
+              ))}
+            </ul>
+          ) : <p>No public link is represented for this evidence record.</p>}
+        </section>
+        {liveUrl ? (
+          <a
+            className="inspect-live-link"
+            href={liveUrl}
+            target="_blank"
+            rel={SAFE_EXTERNAL_REL}
+          >OPEN LIVE SITE ↗</a>
+        ) : null}
+      </aside>
 
       <details className="inspect-details">
         <summary>VIEW EVIDENCE DETAILS</summary>

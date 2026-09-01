@@ -2,7 +2,7 @@
 
 ## Scope and approval
 
-The user explicitly approved the 15 WebP evidence assets listed below for visual use in the WebMCP challenge application and its submission materials. This document records that supplied approval; it does not assign copyright or trademark ownership, grant rights for unrelated reuse, or expand the permission beyond the challenge release.
+The user explicitly approved the 18 WebP evidence assets listed below for visual use in the WebMCP challenge application and its submission materials. This document records that supplied approval; it does not assign copyright or trademark ownership, grant rights for unrelated reuse, or expand the permission beyond the challenge release.
 
 Canonical provenance, dimensions, hashes, captions, and crop notes remain in [`docs/EVIDENCE-MEDIA-MANIFEST.md`](../EVIDENCE-MEDIA-MANIFEST.md).
 
@@ -23,6 +23,9 @@ Canonical provenance, dimensions, hashes, captions, and crop notes remain in [`d
 13. `public/evidence/webhero/webhero-metamorph-bubbles.webp`
 14. `public/evidence/weekfield/weekfield-smart-mix.webp`
 15. `public/evidence/weekfield/weekfield-planet-field.webp`
+16. `public/evidence/presence-os-memory-atlas/presence-os-memory-field.webp`
+17. `public/evidence/presence-os-memory-atlas/presence-os-spatial-inspect.webp`
+18. `public/evidence/sprintcrm/sprintcrm-workspace.webp`
 
 ## Safety confirmation
 
@@ -44,7 +47,7 @@ Final human review of any material third-party-rights concern is **PENDING**. If
 ## Release gate
 
 - [x] User approval for challenge visual use is recorded.
-- [x] All 15 committed paths match the evidence media manifest.
+- [x] All 18 committed paths match the evidence media manifest.
 - [x] Public-safety exclusions are documented.
 - [x] Third-party ownership is expressly disclaimed.
 - [ ] Final human submission-rights review completed — **PENDING**

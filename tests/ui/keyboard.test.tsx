@@ -14,12 +14,12 @@ describe("keyboard evidence navigation", () => {
     node.focus();
     expect(node).toHaveFocus();
     fireEvent.keyDown(node, { key: "Enter" });
-    expect(screen.getByRole("heading", { name: "SELECTED EVIDENCE" })).toHaveFocus();
+    expect(screen.getByRole("heading", { name: "BDB", level: 2 })).toHaveFocus();
     fireEvent.keyDown(document, { key: "Escape" });
     expect(node).toHaveFocus();
 
     fireEvent.keyDown(node, { key: " " });
-    expect(screen.getByRole("heading", { name: "SELECTED EVIDENCE" })).toHaveFocus();
+    expect(screen.getByRole("heading", { name: "BDB", level: 2 })).toHaveFocus();
     expect(node).toHaveAccessibleName("Project BDB, field, not evaluated, inspect selected");
     expect(screen.getByRole("status")).toHaveTextContent("Manual action: Project selected.");
   });

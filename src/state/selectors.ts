@@ -6,6 +6,7 @@ import type { AppSemanticState } from "../application/StatePort";
 import {
   projectPresentation,
   rankedPresentationSlots,
+  type ProjectDefaultPresence,
   type ProjectPresentationTier,
   type ProjectVisualForm,
 } from "../presentation/projectPresentation";
@@ -58,6 +59,7 @@ export interface ProjectNodeState {
   readonly rank: number | null;
   readonly matchState: "not_evaluated" | "matched" | "partial" | "unmatched";
   readonly presentationTier: ProjectPresentationTier;
+  readonly defaultPresence: ProjectDefaultPresence;
   readonly visualForm: ProjectVisualForm;
   readonly spatialTier: "field" | "dominant" | "near" | "secondary" | "receded";
   readonly transform: {
@@ -93,10 +95,9 @@ export const selectProjectNodeStates = (state: AppSemanticState): readonly Proje
     const position = state.matchResult
       ? rankedPresentationSlots[(ranked?.rank ?? index + 1) - 1] ?? rankedPresentationSlots[index]
       : presentation.defaultSlot;
-    const visualForm: ProjectVisualForm = presentation.tier === "flagship"
-      || (hasEvidence && ranked !== undefined && ranked.rank <= 3)
+    const visualForm: ProjectVisualForm = hasEvidence && ranked !== undefined && ranked.rank <= 3
       ? "evidence-object"
-      : "extended-signal";
+      : presentation.defaultPresence;
     const visual = !state.matchResult
       ? presentation.defaultVisual
       : spatialTier === "dominant"
@@ -113,6 +114,7 @@ export const selectProjectNodeStates = (state: AppSemanticState): readonly Proje
       rank: state.matchResult ? ranked?.rank ?? null : null,
       matchState,
       presentationTier: presentation.tier,
+      defaultPresence: presentation.defaultPresence,
       visualForm,
       spatialTier,
       transform: {

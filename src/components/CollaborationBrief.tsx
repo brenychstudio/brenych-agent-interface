@@ -64,7 +64,7 @@ export const CollaborationBrief = ({
   const headingRef = useRef<HTMLHeadingElement>(null);
   const fallbackRef = useRef<HTMLTextAreaElement>(null);
 
-  useLayoutEffect(() => { headingRef.current?.focus({ preventScroll: true }); }, []);
+  useLayoutEffect(() => { headingRef.current?.focus(); }, []);
   useEffect(() => { setValues(toEditable(brief)); }, [brief]);
   useLayoutEffect(() => {
     if (fallbackText) {
@@ -124,7 +124,7 @@ export const CollaborationBrief = ({
   };
 
   return (
-    <section className="brief-surface" aria-labelledby="brief-heading">
+    <section className="brief-surface" data-scroll-owner="document" aria-labelledby="brief-heading">
       <button type="button" className="surface-return brief-return" onClick={() => agent.close("manual")}>BACK TO EVIDENCE</button>
       <header className="brief-header">
         <div>

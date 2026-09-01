@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { App, resetAppForTesting } from "../../src/app/App";
@@ -65,9 +65,31 @@ describe("WebMCP visible tool effects", () => {
     const result = await tools.focus_project.execute({ projectId: "bdb" }, { signal: new AbortController().signal });
 
     expect(result).toEqual(expect.objectContaining({ ok: true, data: expect.objectContaining({ id: expectedDossier.id, title: expectedDossier.title }) }));
-    expect(screen.getByRole("heading", { name: "SELECTED EVIDENCE" })).toBeInTheDocument();
-    expect(screen.getByText(expectedDossier.title, { selector: ".inspect-project" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: expectedDossier.title, level: 2 })).toBeInTheDocument();
     expect(screen.getByText(expectedFocus?.reason ?? "")).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent("WebMCP action: Project selected.");
+
+    await lifecycle.stop();
+  });
+
+  it("opens the same honest Native Site Control inspect through focus_project", async () => {
+    // This catches WebMCP bypassing the canonical Inspect or inventing a public NSC interface.
+    const { lifecycle, tools } = await setupControlledApp();
+
+    const result = await tools.focus_project.execute(
+      { projectId: "native-site-control" },
+      { signal: new AbortController().signal },
+    );
+
+    expect(result).toEqual(expect.objectContaining({
+      ok: true,
+      data: expect.objectContaining({ id: "native-site-control", title: "Native Site Control" }),
+    }));
+    expect(screen.getByRole("heading", { name: "Native Site Control", level: 2 })).toBeInTheDocument();
+    const inspect = screen.getByRole("region", { name: "Native Site Control evidence inspect" });
+    expect(within(inspect).getByText("ARCHITECTURE FOUNDATION")).toBeInTheDocument();
+    expect(within(inspect).getByText("PUBLIC UI NOT YET AVAILABLE")).toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: "Native Site Control evidence media" })).not.toBeInTheDocument();
     expect(screen.getByRole("status")).toHaveTextContent("WebMCP action: Project selected.");
 
     await lifecycle.stop();
@@ -116,7 +138,7 @@ describe("WebMCP visible tool effects", () => {
     expect(screen.getByRole("button", { name: /Project BDB, rank 1/ })).toHaveFocus();
 
     await tools.focus_project.execute({ projectId: "weekfield" }, { signal: new AbortController().signal });
-    expect(screen.getByText("Weekfield", { selector: ".inspect-project" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Weekfield", level: 2 })).toBeInTheDocument();
     fireEvent.keyDown(document, { key: "Escape" });
 
     expect(screen.getByRole("button", { name: /Project Weekfield, rank 4/ })).toHaveFocus();

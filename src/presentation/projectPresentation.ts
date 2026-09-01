@@ -1,7 +1,8 @@
 import type { ProjectId } from "../domain/types";
 
 export type ProjectPresentationTier = "flagship" | "extended";
-export type ProjectVisualForm = "evidence-object" | "extended-signal";
+export type ProjectDefaultPresence = "evidence-object" | "extended-signal" | "latent";
+export type ProjectVisualForm = ProjectDefaultPresence;
 
 export interface PresentationSlot {
   readonly x: number;
@@ -10,6 +11,7 @@ export interface PresentationSlot {
 
 export interface ProjectPresentation {
   readonly tier: ProjectPresentationTier;
+  readonly defaultPresence: ProjectDefaultPresence;
   readonly defaultSlot: PresentationSlot;
   readonly defaultVisual: {
     readonly z: number;
@@ -33,13 +35,13 @@ export const extendedProjectIds = [
 ] as const satisfies readonly ProjectId[];
 
 export const projectPresentation = Object.freeze({
-  bdb: { tier: "flagship", defaultSlot: { x: 4, y: 19 }, defaultVisual: { z: 18, scale: 1.05, opacity: 1, zIndex: 30 } },
-  weekfield: { tier: "flagship", defaultSlot: { x: 58, y: 5 }, defaultVisual: { z: 8, scale: 1, opacity: .96, zIndex: 25 } },
-  "distribution-desk": { tier: "flagship", defaultSlot: { x: 37, y: 40 }, defaultVisual: { z: -40, scale: .88, opacity: .78, zIndex: 16 } },
-  storyform: { tier: "flagship", defaultSlot: { x: 12, y: 64 }, defaultVisual: { z: 4, scale: .98, opacity: .92, zIndex: 22 } },
-  sprintcrm: { tier: "extended", defaultSlot: { x: 82, y: 34 }, defaultVisual: { z: -70, scale: .86, opacity: .62, zIndex: 9 } },
-  "native-site-control": { tier: "extended", defaultSlot: { x: 72, y: 73 }, defaultVisual: { z: -76, scale: .82, opacity: .56, zIndex: 8 } },
-  "presence-os-memory-atlas": { tier: "extended", defaultSlot: { x: 47, y: 64 }, defaultVisual: { z: -82, scale: .8, opacity: .52, zIndex: 7 } },
+  bdb: { tier: "flagship", defaultPresence: "evidence-object", defaultSlot: { x: 4, y: 19 }, defaultVisual: { z: 18, scale: 1.05, opacity: 1, zIndex: 30 } },
+  weekfield: { tier: "flagship", defaultPresence: "evidence-object", defaultSlot: { x: 58, y: 5 }, defaultVisual: { z: 8, scale: 1, opacity: .96, zIndex: 25 } },
+  "distribution-desk": { tier: "flagship", defaultPresence: "evidence-object", defaultSlot: { x: 37, y: 40 }, defaultVisual: { z: -40, scale: .88, opacity: .78, zIndex: 16 } },
+  storyform: { tier: "flagship", defaultPresence: "evidence-object", defaultSlot: { x: 12, y: 64 }, defaultVisual: { z: 4, scale: .98, opacity: .92, zIndex: 22 } },
+  sprintcrm: { tier: "extended", defaultPresence: "extended-signal", defaultSlot: { x: 82, y: 34 }, defaultVisual: { z: -70, scale: .86, opacity: .62, zIndex: 9 } },
+  "native-site-control": { tier: "extended", defaultPresence: "latent", defaultSlot: { x: 72, y: 73 }, defaultVisual: { z: -76, scale: .82, opacity: .56, zIndex: 8 } },
+  "presence-os-memory-atlas": { tier: "extended", defaultPresence: "extended-signal", defaultSlot: { x: 47, y: 64 }, defaultVisual: { z: -82, scale: .8, opacity: .52, zIndex: 7 } },
 } satisfies Readonly<Record<ProjectId, ProjectPresentation>>);
 
 export const rankedPresentationSlots = Object.freeze([

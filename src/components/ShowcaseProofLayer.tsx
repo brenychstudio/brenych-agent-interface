@@ -1,7 +1,15 @@
 import { evidenceMedia } from "../presentation/evidenceMedia";
 import { showcaseProofs } from "../presentation/showcaseProofs";
+import type { MediaInspectRequest } from "./CinematicMediaInspect";
+import { ShowcaseProofChapter } from "./ShowcaseProofChapter";
 
-export const ShowcaseProofLayer = ({ mode }: { readonly mode: "field" | "match" }) => (
+export const ShowcaseProofLayer = ({
+  mode,
+  onMediaInspect,
+}: {
+  readonly mode: "field" | "match";
+  readonly onMediaInspect?: (request: MediaInspectRequest) => void;
+}) => (
   <section
     className={`showcase-layer${mode === "match" ? " is-subdued" : ""}`}
     aria-label="Selected studio systems"
@@ -16,37 +24,19 @@ export const ShowcaseProofLayer = ({ mode }: { readonly mode: "field" | "match" 
       <p className="showcase-boundary">NOT INCLUDED IN EVIDENCE COVERAGE</p>
     </header>
     <div className="showcase-grid">
-      {showcaseProofs.map((proof, index) => {
-        const media = proof.mediaIds.flatMap((id) => {
-          const item = evidenceMedia.find((candidate) => candidate.id === id);
-          return item ? [item] : [];
-        });
-        return (
-          <article className="showcase-proof" key={proof.id} data-showcase-id={proof.id}>
-            <div className="showcase-media" aria-label={`${proof.title} supporting media`}>
-              {media.map((item) => (
-                <figure key={item.id} className={`showcase-frame showcase-frame--${item.role}`}>
-                  <img
-                    src={item.src}
-                    alt={item.alt}
-                    width={item.width}
-                    height={item.height}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  <figcaption>{item.caption}</figcaption>
-                </figure>
-              ))}
-            </div>
-            <div className="showcase-copy">
-              <p className="showcase-index">{String(index + 1).padStart(2, "0")} / 04</p>
-              <h3>{proof.title}</h3>
-              <p className="showcase-role">{proof.role}</p>
-              <p>{proof.summary}</p>
-            </div>
-          </article>
-        );
-      })}
+      {showcaseProofs.map((proof, index) => (
+        <ShowcaseProofChapter
+          key={proof.id}
+          proof={proof}
+          index={index}
+          mode={mode}
+          onMediaInspect={onMediaInspect}
+          media={proof.mediaIds.flatMap((id) => {
+            const item = evidenceMedia.find((candidate) => candidate.id === id);
+            return item ? [item] : [];
+          })}
+        />
+      ))}
     </div>
   </section>
 );

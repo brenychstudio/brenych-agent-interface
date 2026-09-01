@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { buildCollaborationBrief } from "../../src/domain/buildCollaborationBrief";
 import { evidenceRecords } from "../../src/domain/evidence";
+import { capabilities } from "../../src/domain/capabilities";
 import { buildMatchResult } from "../../src/domain/matchRequirements";
 import { projects } from "../../src/domain/projects";
 import {
@@ -43,7 +44,33 @@ describe("supporting studio proof separation", () => {
         proof.id,
       ]);
       expect(proof.relatedCapabilityIds.length).toBeGreaterThan(0);
+      expect(proof.capabilityLabels).toHaveLength(3);
+      expect(proof.capabilityLabels.every((label) => label === label.toUpperCase())).toBe(true);
     }
+  });
+
+  it("keeps presentation-only chapter labels out of the capability vocabulary", () => {
+    // This catches an editorial label being treated as a matchable capability.
+    const capabilityLabels = new Set(capabilities.map((capability) => capability.label.toUpperCase()));
+    const capabilityIds = new Set(capabilities.map((capability) => capability.id));
+    for (const proof of showcaseProofs) {
+      for (const label of proof.capabilityLabels) {
+        expect(capabilityLabels.has(label)).toBe(false);
+        expect(capabilityIds.has(label.toLowerCase().replace(/ /g, "-") as never)).toBe(false);
+      }
+      expect(proof.relatedCapabilityIds.every((id) => capabilityIds.has(id))).toBe(true);
+    }
+  });
+
+  it("carries a live destination only where one was independently verified", () => {
+    // This catches an invented public URL for a system that is not deployed.
+    expect(showcaseProofs.map((proof) => [proof.id, proof.liveUrl])).toEqual([
+      ["webhero", "https://brenychstudio.com/immersive/webhero"],
+      ["photo-web", "https://photo.brenychstudio.com"],
+      ["artist-stage", "https://brenych-artist-stage.brenychinfo.workers.dev/"],
+      ["model-site", undefined],
+    ]);
+    expect(showcaseProofs.every((proof) => proof.liveUrl === undefined || proof.liveUrl.startsWith("https://"))).toBe(true);
   });
 
   it("cannot change coverage, ranking, stable match identity, or brief project IDs", () => {

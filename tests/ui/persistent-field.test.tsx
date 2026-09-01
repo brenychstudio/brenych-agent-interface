@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { readFileSync } from "node:fs";
 import { afterEach, describe, expect, it } from "vitest";
 
@@ -18,9 +18,12 @@ describe("persistent evidence field", () => {
     // This catches a field that fabricates ranking or match depth before evidence has been evaluated.
     render(<App />);
 
-    const initialNodes = screen.getAllByRole("button", { name: /Project / });
-    expect(initialNodes).toHaveLength(7);
+    const camera = screen.getByTestId("evidence-field").querySelector<HTMLElement>(".field-camera");
+    if (!camera) throw new Error("field camera is missing");
+    const initialNodes = within(camera).getAllByRole("button", { name: /Project / });
+    expect(initialNodes).toHaveLength(6);
     expect(initialNodes.every((node) => !/rank|foreground|receded/i.test(node.getAttribute("aria-label") ?? ""))).toBe(true);
+    expect(screen.getAllByRole("button", { name: /Open .* evidence record/, hidden: true })).toHaveLength(7);
     expect(screen.getByText("UNEVALUATED EVIDENCE FIELD")).toBeInTheDocument();
     expect(screen.queryByText("FIELD · NOT EVALUATED")).not.toBeInTheDocument();
 
@@ -28,27 +31,32 @@ describe("persistent evidence field", () => {
     fireEvent.click(screen.getByRole("button", { name: "EVALUATE EVIDENCE" }));
     fireEvent.click(screen.getByRole("button", { name: "Clear match" }));
 
-    expect(screen.getAllByRole("button", { name: /Project / }).every((node) => !/rank|foreground|receded/i.test(node.getAttribute("aria-label") ?? ""))).toBe(true);
+    expect(within(camera).getAllByRole("button", { name: /Project / })).toHaveLength(6);
+    expect(within(camera).getAllByRole("button", { name: /Project / }).every((node) => !/rank|foreground|receded/i.test(node.getAttribute("aria-label") ?? ""))).toBe(true);
+    expect(screen.getAllByRole("button", { name: /Open .* evidence record/, hidden: true })).toHaveLength(7);
     expect(screen.getByText("UNEVALUATED EVIDENCE FIELD")).toBeInTheDocument();
   });
 
   it("keeps desktop dossiers separated and switches to a safe responsive sequence", () => {
     // This catches field nodes that overlap sibling text at desktop or remain absolute through tablet/mobile layouts.
     render(<App />);
-    const xPositions = screen.getAllByRole("button", { name: /Project / }).map((node) => node.style.getPropertyValue("--node-x"));
-    const yPositions = screen.getAllByRole("button", { name: /Project / }).map((node) => node.style.getPropertyValue("--node-y"));
+    const field = screen.getByTestId("evidence-field");
+    const camera = field.querySelector<HTMLElement>(".field-camera");
+    if (!camera) throw new Error("field camera is missing");
+    const constellation = within(camera);
+    const xPositions = constellation.getAllByRole("button", { name: /Project / }).map((node) => node.style.getPropertyValue("--node-x"));
+    const yPositions = constellation.getAllByRole("button", { name: /Project / }).map((node) => node.style.getPropertyValue("--node-y"));
     const tabletRule = evidenceFieldCss.match(/@media \(max-width: 900px\)[\s\S]*?(?=@media \(max-width: 620px\)|$)/)?.[0] ?? "";
     const mobileRule = evidenceFieldCss.match(/@media \(max-width: 620px\)[\s\S]*/)?.[0] ?? "";
 
-    expect(new Set(xPositions.map((x, index) => `${x}:${yPositions[index]}`)).size).toBe(7);
+    expect(new Set(xPositions.map((x, index) => `${x}:${yPositions[index]}`)).size).toBe(6);
     expect(xPositions.every((position) => position.endsWith("%"))).toBe(true);
     expect(yPositions.every((position) => position.endsWith("%"))).toBe(true);
     expect(screen.getByRole("button", { name: /Project Presence OS Memory Atlas/ }).style.getPropertyValue("--node-y")).toBe("64%");
     expect(evidenceFieldCss).toMatch(/\.evidence-field \{[\s\S]*min-height: 74rem;[\s\S]*perspective: 850px;/);
-    const field = screen.getByTestId("evidence-field");
-    const camera = field.querySelector(".field-camera");
-    expect(camera).toContainElement(screen.getByRole("button", { name: /Project BDB/ }));
-    expect(camera).toContainElement(screen.getByRole("button", { name: /Project Presence OS Memory Atlas/ }));
+    expect(camera).toContainElement(constellation.getByRole("button", { name: /Project BDB/ }));
+    expect(camera).toContainElement(constellation.getByRole("button", { name: /Project Presence OS Memory Atlas/ }));
+    expect(camera).not.toContainElement(screen.getByRole("button", { name: "Open Native Site Control evidence record", hidden: true }));
     expect(tabletRule).toMatch(/\.evidence-field \{[\s\S]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);[\s\S]*perspective: none;/);
     expect(tabletRule).toMatch(/\.project-node,[\s\S]*position: relative;[\s\S]*width: 100%;[\s\S]*translate3d\(0, 0, 0\) scale\(1\)/);
     expect(tabletRule).toMatch(/\.project-node,[\s\S]*order: var\(--node-order\)/);
@@ -102,7 +110,11 @@ describe("persistent evidence field", () => {
     expect(screen.getByRole("region", { name: "NOT DEMONSTRATED" })).toHaveTextContent("CoreML");
     expect(screen.getAllByText("NOT DEMONSTRATED")).not.toHaveLength(0);
     expect(screen.getByRole("button", { name: /BDB.*foreground/i })).toBeInTheDocument();
-    expect(screen.getAllByRole("button", { name: /project.*(BDB|Distribution Desk|Weekfield|SprintCRM|StoryForm|Native Site Control|Presence OS Memory Atlas)/i })).toHaveLength(7);
+    const camera = screen.getByTestId("evidence-field").querySelector<HTMLElement>(".field-camera");
+    if (!camera) throw new Error("field camera is missing");
+    expect(within(camera).getAllByRole("button", { name: /Project / })).toHaveLength(6);
+    expect(screen.getAllByRole("button", { name: /Open .* evidence record/, hidden: true })).toHaveLength(7);
+    expect(screen.getByRole("button", { name: "Open Native Site Control evidence record", hidden: true })).toBeInTheDocument();
   });
 
   it("recedes unmatched nodes when a narrow evaluation has a single leading match", () => {

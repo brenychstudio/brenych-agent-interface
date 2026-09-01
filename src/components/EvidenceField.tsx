@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { motion, useMotionValue, useReducedMotion, useSpring } from "motion/react";
 
 import type { AgentInterface, ProjectDossier } from "../application/AgentInterface";
@@ -39,47 +39,98 @@ export const EvidenceField = ({
   readonly connections?: readonly CapabilityTrace[];
   readonly action?: SemanticAction | null;
 }) => {
-  const [pan, setPan] = useState({ x: 0, y: 0 });
-  const [parallax, setParallax] = useState({ x: 0, y: 0 });
   const [dragging, setDragging] = useState(false);
   const [hoveredProjectId, setHoveredProjectId] = useState<ProjectId | null>(null);
+  const [indexOpen, setIndexOpen] = useState(false);
   const drag = useRef<DragState | null>(null);
+  const fieldRef = useRef<HTMLElement>(null);
+  const cameraRef = useRef<HTMLDivElement>(null);
+  const diagnosticFrame = useRef<number | null>(null);
+  const renders = useRef(0);
+  renders.current += 1;
   const reduceMotion = useReducedMotion();
+
+  // High-frequency camera input lives entirely outside React: pointer pixels never schedule a render.
+  const panX = useMotionValue(0);
+  const panY = useMotionValue(0);
+  const pointerX = useMotionValue(0);
+  const pointerY = useMotionValue(0);
   const cameraXTarget = useMotionValue(0);
   const cameraYTarget = useMotionValue(0);
   const cameraX = useSpring(cameraXTarget, { stiffness: 160, damping: 24, mass: .75 });
   const cameraY = useSpring(cameraYTarget, { stiffness: 160, damping: 24, mass: .75 });
 
+  const writeDiagnostics = useCallback((): void => {
+    const field = fieldRef.current;
+    const camera = cameraRef.current;
+    if (field) {
+      field.dataset.panX = String(panX.get());
+      field.dataset.panY = String(panY.get());
+      field.dataset.parallaxX = String(pointerX.get());
+      field.dataset.parallaxY = String(pointerY.get());
+    }
+    if (camera) {
+      camera.dataset.cameraX = String(cameraXTarget.get());
+      camera.dataset.cameraY = String(cameraYTarget.get());
+    }
+  }, [cameraXTarget, cameraYTarget, panX, panY, pointerX, pointerY]);
+
+  // One coalesced DOM write per frame at most, whatever the pointer event rate.
+  const commit = useCallback((): void => {
+    cameraXTarget.set(reduceMotion ? 0 : panX.get() + pointerX.get());
+    cameraYTarget.set(reduceMotion ? 0 : panY.get() + pointerY.get());
+    if (diagnosticFrame.current !== null) return;
+    diagnosticFrame.current = requestAnimationFrame(() => {
+      diagnosticFrame.current = null;
+      writeDiagnostics();
+    });
+  }, [cameraXTarget, cameraYTarget, panX, panY, pointerX, pointerY, reduceMotion, writeDiagnostics]);
+
+  useLayoutEffect(() => {
+    writeDiagnostics();
+    return () => {
+      if (diagnosticFrame.current !== null) cancelAnimationFrame(diagnosticFrame.current);
+      diagnosticFrame.current = null;
+    };
+  }, [writeDiagnostics]);
+
   useEffect(() => {
-    cameraXTarget.set(reduceMotion ? 0 : pan.x + parallax.x);
-    cameraYTarget.set(reduceMotion ? 0 : pan.y + parallax.y);
-  }, [cameraXTarget, cameraYTarget, pan, parallax, reduceMotion]);
+    if (!reduceMotion) return;
+    panX.set(0);
+    panY.set(0);
+    pointerX.set(0);
+    pointerY.set(0);
+    cameraXTarget.set(0);
+    cameraYTarget.set(0);
+    writeDiagnostics();
+  }, [cameraXTarget, cameraYTarget, panX, panY, pointerX, pointerY, reduceMotion, writeDiagnostics]);
 
   const pointerMotionAllowed = (event: ReactPointerEvent<HTMLElement>): boolean =>
     event.pointerType !== "touch" && !window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
   const startDrag = (event: ReactPointerEvent<HTMLElement>): void => {
     const target = event.target;
-    if (!pointerMotionAllowed(event) || (target instanceof Element && target.closest("button"))) return;
+    if (!pointerMotionAllowed(event) || (target instanceof Element && target.closest("button, details, summary, a"))) return;
     drag.current = {
       pointerId: event.pointerId,
       originX: event.clientX,
       originY: event.clientY,
-      startX: pan.x,
-      startY: pan.y,
+      startX: panX.get(),
+      startY: panY.get(),
     };
-    setParallax({ x: 0, y: 0 });
+    pointerX.set(0);
+    pointerY.set(0);
     setDragging(true);
+    commit();
     event.currentTarget.setPointerCapture?.(event.pointerId);
   };
 
   const moveDrag = (event: ReactPointerEvent<HTMLElement>): void => {
     const active = drag.current;
     if (!active || active.pointerId !== event.pointerId) return;
-    setPan({
-      x: clamp(active.startX + event.clientX - active.originX, -76, 76),
-      y: clamp(active.startY + event.clientY - active.originY, -42, 42),
-    });
+    panX.set(clamp(active.startX + event.clientX - active.originX, -76, 76));
+    panY.set(clamp(active.startY + event.clientY - active.originY, -42, 42));
+    commit();
   };
 
   const movePointer = (event: ReactPointerEvent<HTMLElement>): void => {
@@ -95,7 +146,9 @@ export const EvidenceField = ({
     const top = rect.height ? rect.top : 0;
     const x = clamp(((event.clientX - left) / width) * 2 - 1, -1, 1);
     const y = clamp(((event.clientY - top) / height) * 2 - 1, -1, 1);
-    setParallax({ x: Math.round(x * 18), y: Math.round(y * 12) });
+    pointerX.set(Math.round(x * 18));
+    pointerY.set(Math.round(y * 12));
+    commit();
   };
 
   const stopDrag = (event: ReactPointerEvent<HTMLElement>): void => {
@@ -105,11 +158,24 @@ export const EvidenceField = ({
     setDragging(false);
   };
 
+  const releaseParallax = (): void => {
+    if (drag.current) return;
+    pointerX.set(0);
+    pointerY.set(0);
+    commit();
+  };
+
+  const visibleNodes = nodes.filter((node) =>
+    node.visualForm !== "latent" || node.projectId === inspectedProjectId,
+  );
+  const visibleProjectIds = new Set(visibleNodes.map(({ projectId }) => projectId));
+  const visibleConnections = connections.filter(({ projectId }) => visibleProjectIds.has(projectId));
+  const visibleDossiers = dossiers.filter(({ id }) => visibleProjectIds.has(id));
   const activeNode = hoveredProjectId
-    ? nodes.find(({ projectId }) => projectId === hoveredProjectId)
+    ? visibleNodes.find(({ projectId }) => projectId === hoveredProjectId)
     : undefined;
   const neighbors = activeNode
-    ? nodes
+    ? visibleNodes
       .filter(({ projectId }) => projectId !== activeNode.projectId)
       .map((node) => ({
         projectId: node.projectId,
@@ -126,22 +192,20 @@ export const EvidenceField = ({
 
   return (
     <section
+      ref={fieldRef}
       className={`evidence-field${receded ? " is-receded" : ""}${dragging ? " is-dragging" : ""}`}
       data-testid="evidence-field"
-      data-pan-x={pan.x}
-      data-pan-y={pan.y}
-      data-parallax-x={parallax.x}
-      data-parallax-y={parallax.y}
+      data-render-count={renders.current}
       aria-label="Evidence field"
       onPointerDown={startDrag}
       onPointerMove={movePointer}
       onPointerUp={stopDrag}
       onPointerCancel={stopDrag}
-      onPointerLeave={() => { if (!drag.current) setParallax({ x: 0, y: 0 }); }}
+      onPointerLeave={releaseParallax}
     >
       <div className="field-heading">
         <p className="field-label">CORE EVIDENCE GRAPH</p>
-        <p className="field-count">4 FLAGSHIP OBJECTS · 3 EXTENDED SIGNALS</p>
+        <p className="field-count">4 EVIDENCE OBJECTS · 2 EXTENDED SIGNALS · 1 LATENT RECORD</p>
         <p className="field-state">{evaluated ? "EVALUATED EVIDENCE FIELD" : "UNEVALUATED EVIDENCE FIELD"}</p>
         <p className="field-action" aria-label="Shared surface control provenance">
           <strong>{action ? `${action.source === "webmcp" ? "WEBMCP" : "MANUAL"} ACTION` : "SHARED HUMAN + AGENT SURFACE"}</strong>
@@ -149,10 +213,10 @@ export const EvidenceField = ({
         </p>
         <p className="field-media-boundary">VISUALS: USER-APPROVED SCREENSHOTS · CLAIMS: VERIFIED EVIDENCE RECORDS</p>
       </div>
-      <motion.div className="field-camera" style={{ x: cameraX, y: cameraY }}>
+      <motion.div ref={cameraRef} className="field-camera" data-testid="field-camera" style={{ x: cameraX, y: cameraY }}>
         <div className="field-grid" aria-hidden="true" />
-        <CapabilityConnections traces={connections} nodes={nodes} dossiers={dossiers} />
-        {nodes.map((node) => {
+        <CapabilityConnections traces={visibleConnections} nodes={visibleNodes} dossiers={visibleDossiers} />
+        {visibleNodes.map((node) => {
           const dossier = dossiers.find((candidate) => candidate.id === node.projectId);
           const proximity = hoveredProjectId === node.projectId
             ? "active"
@@ -171,6 +235,31 @@ export const EvidenceField = ({
           ) : null;
         })}
       </motion.div>
+      <details
+        className="evidence-index"
+        onPointerDown={(event) => event.stopPropagation()}
+        onToggle={(event) => setIndexOpen(event.currentTarget.open)}
+      >
+        <summary onClick={(event) => setIndexOpen(!event.currentTarget.closest<HTMLDetailsElement>("details")?.open)}>FULL EVIDENCE INDEX</summary>
+        <p>7 VERIFIED PROJECT RECORDS</p>
+        <div className="evidence-index-list" aria-hidden={indexOpen ? undefined : true}>
+          {dossiers.map((dossier) => (
+            <button
+              key={dossier.id}
+              type="button"
+              data-project-id={dossier.id}
+              aria-label={`Open ${dossier.title} evidence record`}
+              onClick={(event) => {
+                onProjectFocus?.(event.currentTarget);
+                agent.focusProject({ projectId: dossier.id }, "manual");
+              }}
+            >
+              <span>{dossier.title}</span>
+              <span>OPEN ↗</span>
+            </button>
+          ))}
+        </div>
+      </details>
     </section>
   );
 };

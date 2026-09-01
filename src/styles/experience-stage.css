@@ -32,7 +32,25 @@
 .stage-workspace--brief .stage-canvas { width: 100%; height: 100%; }
 .stage-workspace--inspect .evidence-field,
 .stage-workspace--brief .evidence-field { height: 100%; min-height: 100%; }
-.stage-foreground { position: relative; z-index: 60; align-self: start; }
+.stage-foreground {
+  position: relative;
+  z-index: 60;
+  align-self: start;
+  width: 100%;
+  min-height: calc(100dvh - 6.5rem);
+}
+/* The paper surface is a sibling layer, never an ancestor: a transform here would break sticky Back. */
+.stage-foreground-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  box-shadow: 0 2rem 6rem color-mix(in srgb, #000 24%, transparent);
+}
+.stage-foreground-inner { position: relative; z-index: 1; width: min(100%, 92rem); margin: 0 auto; }
+.stage-foreground-inner--brief { width: min(100%, 74rem); }
 
 @media (max-width: 1150px) {
   .stage-workspace,
@@ -43,6 +61,7 @@
 @media (max-width: 620px) {
   .experience-stage--inspect,
   .experience-stage--brief { min-height: 0; }
+  .stage-foreground { min-height: 0; }
   .stage-workspace,
   .stage-workspace--field { display: block; }
   .stage-studio-rail { margin-bottom: 2rem; }
