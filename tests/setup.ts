@@ -1,5 +1,11 @@
 import "@testing-library/jest-dom/vitest";
 
+Object.defineProperty(window, "scrollTo", {
+  configurable: true,
+  writable: true,
+  value: () => undefined,
+});
+
 if (typeof globalThis.PointerEvent === "undefined") {
   class TestPointerEvent extends MouseEvent {
     readonly pointerId: number;

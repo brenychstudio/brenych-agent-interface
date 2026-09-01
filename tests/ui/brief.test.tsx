@@ -36,6 +36,9 @@ describe("collaboration brief", () => {
     expect(screen.queryByRole("button", { name: "SUBMIT BRIEF" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "SEND BRIEF" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "BOOK CONSULTATION" })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "CONTINUE WITH BRENYCH STUDIO ↗" })).toHaveAttribute("href", "https://brenychstudio.com");
+    expect(screen.getByRole("link", { name: "CONTINUE WITH BRENYCH STUDIO ↗" })).toHaveAttribute("rel", "noopener noreferrer");
+    expect(screen.queryByRole("region", { name: "Selected studio systems" })).not.toBeInTheDocument();
     expect(screen.getByTestId("evidence-field")).toHaveClass("is-receded");
 
     const context = screen.getByRole("textbox", { name: "Context" });

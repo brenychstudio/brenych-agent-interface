@@ -1,15 +1,16 @@
 import { evidenceMedia } from "../presentation/evidenceMedia";
 import { showcaseProofs } from "../presentation/showcaseProofs";
 
-export const ShowcaseProofLayer = ({ quiet = false }: { readonly quiet?: boolean }) => (
+export const ShowcaseProofLayer = ({ mode }: { readonly mode: "field" | "match" }) => (
   <section
-    className={`showcase-layer${quiet ? " is-quiet" : ""}`}
+    className={`showcase-layer${mode === "match" ? " is-subdued" : ""}`}
     aria-label="Selected studio systems"
   >
     <header className="showcase-header">
       <div>
         <p className="eyebrow">SUPPORTING PROOF — NON-SCORING</p>
         <h2 id="showcase-heading">SELECTED STUDIO SYSTEMS</h2>
+        <p className="showcase-subtitle">Creative, spatial and product interfaces from the wider Brenych Studio practice.</p>
         <p className="showcase-media-authority">SHOWCASE VISUALS: USER-APPROVED SCREENSHOTS · TECHNICAL CLAIMS VERIFIED SEPARATELY</p>
       </div>
       <p className="showcase-boundary">NOT INCLUDED IN EVIDENCE COVERAGE</p>

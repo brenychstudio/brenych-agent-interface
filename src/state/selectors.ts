@@ -3,6 +3,12 @@ import { evidenceRecords } from "../domain/evidence";
 import { projects } from "../domain/projects";
 import type { ProjectId } from "../domain/types";
 import type { AppSemanticState } from "../application/StatePort";
+import {
+  projectPresentation,
+  rankedPresentationSlots,
+  type ProjectPresentationTier,
+  type ProjectVisualForm,
+} from "../presentation/projectPresentation";
 
 export const selectMissingRequirementIds = (state: AppSemanticState): readonly string[] => state.matchResult?.missing ?? [];
 
@@ -51,6 +57,8 @@ export interface ProjectNodeState {
   readonly projectId: ProjectId;
   readonly rank: number | null;
   readonly matchState: "not_evaluated" | "matched" | "partial" | "unmatched";
+  readonly presentationTier: ProjectPresentationTier;
+  readonly visualForm: ProjectVisualForm;
   readonly spatialTier: "field" | "dominant" | "near" | "secondary" | "receded";
   readonly transform: {
     readonly x: number;
@@ -62,29 +70,10 @@ export interface ProjectNodeState {
   };
 }
 
-const defaultPositions = [
-  { x: 3, y: 4 },
-  { x: 37, y: 9 },
-  { x: 69, y: 3 },
-  { x: 7, y: 47 },
-  { x: 38, y: 44 },
-  { x: 71, y: 49 },
-  { x: 36, y: 64 },
-] as const;
-
-const rankedPositions = [
-  { x: 34, y: 3 },
-  { x: 3, y: 33 },
-  { x: 67, y: 33 },
-  { x: 1, y: 58 },
-  { x: 26, y: 61 },
-  { x: 51, y: 58 },
-  { x: 76, y: 61 },
-] as const;
-
 export const selectProjectNodeStates = (state: AppSemanticState): readonly ProjectNodeState[] => {
   const rankByProject = new Map(state.matchResult?.rankedProjects.map((project, index) => [project.projectId, { project, rank: index + 1 }]) ?? []);
   return projects.map((project, index) => {
+    const presentation = projectPresentation[project.id];
     const ranked = rankByProject.get(project.id);
     const matchState = !state.matchResult
       ? "not_evaluated"
@@ -102,21 +91,29 @@ export const selectProjectNodeStates = (state: AppSemanticState): readonly Proje
             ? "near"
             : "secondary";
     const position = state.matchResult
-      ? rankedPositions[(ranked?.rank ?? index + 1) - 1] ?? rankedPositions[index]
-      : defaultPositions[index];
-    const visual = spatialTier === "dominant"
-      ? { z: 36, scale: 1.12, opacity: 1, zIndex: 40 }
-      : spatialTier === "near"
-        ? { z: 4, scale: 1, opacity: 0.94, zIndex: 28 - (ranked?.rank ?? 0) }
-        : spatialTier === "secondary"
-          ? { z: -44, scale: 0.84, opacity: 0.66, zIndex: 10 }
-          : spatialTier === "receded"
-            ? { z: -88, scale: 0.8, opacity: 0.42, zIndex: 5 }
-            : { z: -18, scale: 1, opacity: 0.9, zIndex: 12 - index };
+      ? rankedPresentationSlots[(ranked?.rank ?? index + 1) - 1] ?? rankedPresentationSlots[index]
+      : presentation.defaultSlot;
+    const visualForm: ProjectVisualForm = presentation.tier === "flagship"
+      || (hasEvidence && ranked !== undefined && ranked.rank <= 3)
+      ? "evidence-object"
+      : "extended-signal";
+    const visual = !state.matchResult
+      ? presentation.defaultVisual
+      : spatialTier === "dominant"
+        ? { z: 36, scale: 1.12, opacity: 1, zIndex: 40 }
+        : spatialTier === "near"
+          ? { z: 4, scale: 1, opacity: 0.94, zIndex: 28 - (ranked?.rank ?? 0) }
+          : spatialTier === "secondary"
+            ? { z: -44, scale: 0.84, opacity: 0.66, zIndex: 10 }
+            : spatialTier === "receded"
+              ? { z: -88, scale: 0.8, opacity: 0.42, zIndex: 5 }
+              : presentation.defaultVisual;
     return {
       projectId: project.id,
       rank: state.matchResult ? ranked?.rank ?? null : null,
       matchState,
+      presentationTier: presentation.tier,
+      visualForm,
       spatialTier,
       transform: {
         x: position.x,

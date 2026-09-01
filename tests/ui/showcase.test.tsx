@@ -11,6 +11,7 @@ describe("supporting studio proof layer", () => {
 
     const showcase = screen.getByRole("region", { name: "Selected studio systems" });
     expect(within(showcase).getByRole("heading", { name: "SELECTED STUDIO SYSTEMS" })).toBeInTheDocument();
+    expect(within(showcase).getByText("Creative, spatial and product interfaces from the wider Brenych Studio practice.")).toBeInTheDocument();
     expect(within(showcase).getByText("SUPPORTING PROOF — NON-SCORING")).toBeInTheDocument();
     expect(within(showcase).getByText("NOT INCLUDED IN EVIDENCE COVERAGE")).toBeInTheDocument();
     expect(within(showcase).getByText(/SHOWCASE VISUALS: USER-APPROVED SCREENSHOTS/)).toBeInTheDocument();
@@ -22,13 +23,27 @@ describe("supporting studio proof layer", () => {
     });
   });
 
-  it("quiets supporting proof when scored evidence becomes active without removing it", () => {
+  it("subdues supporting proof in Match without making it look disabled", () => {
     render(<App />);
     fireEvent.click(screen.getByRole("button", { name: "Add Electron" }));
     fireEvent.click(screen.getByRole("button", { name: "EVALUATE EVIDENCE" }));
 
     const showcase = screen.getByRole("region", { name: "Selected studio systems" });
-    expect(showcase).toHaveClass("is-quiet");
+    expect(showcase).toHaveClass("is-subdued");
+    expect(showcase).not.toHaveClass("is-quiet");
     expect(within(showcase).getAllByRole("article")).toHaveLength(4);
+  });
+
+  it("leaves Inspect and Brief as clean foreground modes without the showcase", () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Add Electron" }));
+    fireEvent.click(screen.getByRole("button", { name: "EVALUATE EVIDENCE" }));
+    fireEvent.click(screen.getByRole("button", { name: /Project BDB/ }));
+
+    expect(screen.queryByRole("region", { name: "Selected studio systems" })).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "CREATE COLLABORATION BRIEF" }));
+
+    expect(screen.queryByRole("region", { name: "Selected studio systems" })).not.toBeInTheDocument();
   });
 });

@@ -5,6 +5,7 @@ import { App } from "./app/App";
 import "./styles/tokens.css";
 import "./styles/global.css";
 import "./styles/shell.css";
+import "./styles/experience-stage.css";
 import "./styles/evidence-field.css";
 import "./styles/inspect.css";
 import "./styles/brief.css";

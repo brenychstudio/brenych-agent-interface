@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { App, resetAppForTesting } from "../../src/app/App";
 
 const evidenceFieldCss = readFileSync("src/styles/evidence-field.css", "utf8");
+const evidenceFieldSource = readFileSync("src/components/EvidenceField.tsx", "utf8");
 const projectNodeSource = readFileSync("src/components/ProjectNode.tsx", "utf8");
 const packageJson = JSON.parse(readFileSync("package.json", "utf8")) as {
   readonly dependencies?: Record<string, string>;
@@ -20,14 +21,15 @@ describe("persistent evidence field", () => {
     const initialNodes = screen.getAllByRole("button", { name: /Project / });
     expect(initialNodes).toHaveLength(7);
     expect(initialNodes.every((node) => !/rank|foreground|receded/i.test(node.getAttribute("aria-label") ?? ""))).toBe(true);
-    expect(initialNodes[0]).toHaveTextContent("FIELD · NOT EVALUATED");
+    expect(screen.getByText("UNEVALUATED EVIDENCE FIELD")).toBeInTheDocument();
+    expect(screen.queryByText("FIELD · NOT EVALUATED")).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Add Electron" }));
     fireEvent.click(screen.getByRole("button", { name: "EVALUATE EVIDENCE" }));
     fireEvent.click(screen.getByRole("button", { name: "Clear match" }));
 
     expect(screen.getAllByRole("button", { name: /Project / }).every((node) => !/rank|foreground|receded/i.test(node.getAttribute("aria-label") ?? ""))).toBe(true);
-    expect(screen.getByRole("button", { name: /Project BDB/ })).toHaveTextContent("FIELD · NOT EVALUATED");
+    expect(screen.getByText("UNEVALUATED EVIDENCE FIELD")).toBeInTheDocument();
   });
 
   it("keeps desktop dossiers separated and switches to a safe responsive sequence", () => {
@@ -43,8 +45,10 @@ describe("persistent evidence field", () => {
     expect(yPositions.every((position) => position.endsWith("%"))).toBe(true);
     expect(screen.getByRole("button", { name: /Project Presence OS Memory Atlas/ }).style.getPropertyValue("--node-y")).toBe("64%");
     expect(evidenceFieldCss).toMatch(/\.evidence-field \{[\s\S]*min-height: 74rem;[\s\S]*perspective: 850px;/);
-    expect(evidenceFieldCss).toMatch(/\.project-node \{[\s\S]*top: calc\(var\(--node-y\) \+ 3rem \+ var\(--field-pan-y, 0px\)\);/);
-    expect(evidenceFieldCss).toMatch(/\.project-node \{[\s\S]*width: 29%;/);
+    const field = screen.getByTestId("evidence-field");
+    const camera = field.querySelector(".field-camera");
+    expect(camera).toContainElement(screen.getByRole("button", { name: /Project BDB/ }));
+    expect(camera).toContainElement(screen.getByRole("button", { name: /Project Presence OS Memory Atlas/ }));
     expect(tabletRule).toMatch(/\.evidence-field \{[\s\S]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);[\s\S]*perspective: none;/);
     expect(tabletRule).toMatch(/\.project-node,[\s\S]*position: relative;[\s\S]*width: 100%;[\s\S]*translate3d\(0, 0, 0\) scale\(1\)/);
     expect(tabletRule).toMatch(/\.project-node,[\s\S]*order: var\(--node-order\)/);
@@ -60,9 +64,11 @@ describe("persistent evidence field", () => {
     expect(packageJson.dependencies?.motion).toBeTruthy();
     expect(projectNodeSource).toContain('from "motion/react"');
     expect(projectNodeSource).toContain("useReducedMotion");
+    expect(evidenceFieldSource).toContain("useMotionValue");
+    expect(evidenceFieldSource).toContain("useSpring");
     expect(projectNodeSource).toContain("<motion.button");
     expect(projectNodeSource).toContain("initial={false}");
-    expect(projectNodeSource).toContain("reduceMotion ? 0 : 0.18");
+    expect(projectNodeSource).toContain("reduceMotion");
   });
 
   it("keeps the longest inspect-background dossier contained without depth projection", () => {

@@ -1,11 +1,22 @@
 .brief-surface {
-  max-width: 74rem;
-  margin-top: clamp(-13rem, -12vw, -6rem);
+  width: min(100%, 74rem);
+  max-height: calc(100dvh - 6.5rem);
+  margin: 0 auto;
+  overflow: auto;
   padding: clamp(1rem, 3vw, 2.5rem);
   border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--paper) 96%, transparent);
   box-shadow: 0 2.5rem 6rem color-mix(in srgb, var(--ink) 14%, transparent);
 }
 .brief-surface h2 { max-width: 9ch; font-size: clamp(3.5rem, 9vw, 8rem); }
+.brief-return {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: block;
+  margin-left: auto;
+  background: var(--paper);
+}
 .brief-draft-label { margin: 0; }
 .brief-authority {
   display: grid;
@@ -34,20 +45,21 @@
 .brief-fields textarea { min-height: 7rem; resize: vertical; }
 .brief-fields input:focus-visible,
 .brief-fields textarea:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
-.brief-actions { justify-content: flex-start; margin-top: 1.5rem; }
+.brief-actions { display: flex; align-items: center; justify-content: flex-start; gap: 1rem; margin-top: 1.5rem; }
+.brief-studio-link { border-bottom: 1px solid currentColor; font: 650 .7rem/1.3 var(--mono); letter-spacing: .05em; text-decoration: none; }
+.brief-studio-link:focus-visible { outline: 2px solid var(--ink); outline-offset: .3rem; }
 .copy-status { margin-bottom: 0; font: .75rem var(--mono); }
 .brief-input-hint { grid-column: 1 / -1; margin: -1rem 0 .25rem; color: var(--muted); font: .68rem/1.4 var(--mono); }
 .brief-copy-fallback { width: 100%; min-height: 12rem; margin-top: 1rem; border: 2px solid var(--ink); background: var(--paper); color: var(--ink); padding: .75rem; font: .8rem/1.45 var(--mono); }
 .brief-copy-fallback:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .evidence-chip-list { padding: 0; list-style: none; }
 .evidence-chip { font: 600 .68rem var(--mono); }
-.experience--brief .showcase-layer { margin-top: 1rem; }
-
 @media (max-width: 620px) {
-  .brief-surface { margin-top: 1rem; padding: 1rem; }
+  .brief-surface { width: 100%; max-height: none; margin: 0; overflow: visible; padding: 1rem; }
   .brief-authority { grid-template-columns: 1fr 1fr; }
   .brief-authority > * { border-bottom: 1px solid var(--line); }
   .brief-fields { grid-template-columns: 1fr; }
   .brief-fields label { grid-column: 1 !important; }
   .brief-input-hint { grid-column: 1; }
+  .brief-actions { align-items: flex-start; flex-direction: column; }
 }

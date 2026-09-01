@@ -49,7 +49,7 @@ export const RequirementComposer = ({
   return (
     <section className="requirement-composer" aria-labelledby="requirement-heading">
       <p className="eyebrow">MANUAL REQUIREMENTS</p>
-      <h1 id="requirement-heading">WHAT ARE YOU BUILDING?</h1>
+      <h2 id="requirement-heading">WHAT ARE YOU BUILDING?</h2>
       <p className="composer-thesis">
         An agent can rank, focus, and draft from the same public evidence you inspect here. Manual control always remains available.
       </p>

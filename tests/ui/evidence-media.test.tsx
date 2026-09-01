@@ -6,7 +6,7 @@ import { App, resetAppForTesting } from "../../src/app/App";
 afterEach(() => { cleanup(); resetAppForTesting(); });
 
 describe("real media evidence nodes", () => {
-  it("uses approved media for evidenced core projects and honest type-led objects for the rest", () => {
+  it("uses approved media for flagship projects and peripheral signals for extended evidence", () => {
     // This catches fake screenshot placeholders or approved core media failing to reach the evidence field.
     render(<App />);
 
@@ -29,9 +29,11 @@ describe("real media evidence nodes", () => {
 
     for (const title of ["SprintCRM", "Native Site Control", "Presence OS Memory Atlas"]) {
       const node = screen.getByRole("button", { name: new RegExp(`Project ${title}, field, not evaluated`, "i") });
-      expect(node).toHaveAttribute("data-media-kind", "typographic");
+      expect(node).toHaveAttribute("data-media-kind", "signal");
+      expect(node).toHaveAttribute("data-presentation-tier", "extended");
+      expect(node).toHaveAttribute("data-visual-form", "extended-signal");
       expect(within(node).queryByRole("img")).not.toBeInTheDocument();
-      expect(node).toHaveTextContent("TYPE-LED EVIDENCE");
+      expect(node).toHaveTextContent("EXTENDED EVIDENCE");
     }
 
     expect(screen.getAllByRole("button", { name: /Project / })).toHaveLength(7);

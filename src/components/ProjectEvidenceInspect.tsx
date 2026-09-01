@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { motion } from "motion/react";
 
 import type { AgentInterface, ProjectDossier } from "../application/AgentInterface";
 import type { MatchResult } from "../domain/types";
@@ -21,15 +22,11 @@ export const ProjectEvidenceInspect = ({
   readonly focus: FocusedProjectContext;
   readonly match: MatchResult | null;
 }) => {
-  const surfaceRef = useRef<HTMLElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const [error, setError] = useState<string | null>(null);
   const media = mediaForOwner(dossier.id).slice(0, 2);
 
-  useEffect(() => {
-    surfaceRef.current?.scrollIntoView?.({ block: "start" });
-    headingRef.current?.focus({ preventScroll: true });
-  }, []);
+  useEffect(() => { headingRef.current?.focus({ preventScroll: true }); }, []);
 
   const createBrief = (): void => {
     if (!match) return;
@@ -45,7 +42,7 @@ export const ProjectEvidenceInspect = ({
   };
 
   return (
-    <section ref={surfaceRef} className="inspect-surface" data-surface="integrated-shell" aria-labelledby="inspect-heading">
+    <section className="inspect-surface" data-surface="integrated-shell" aria-labelledby="inspect-heading">
       <div className="inspect-header">
         <div>
           <p className="eyebrow">PROJECT EVIDENCE INSPECT</p>
@@ -55,15 +52,50 @@ export const ProjectEvidenceInspect = ({
       </div>
 
       <div className="inspect-hero">
-        <div className="inspect-title-block">
-          <p className="inspect-selection">SELECTED / DETERMINISTIC EVIDENCE</p>
-          <h2 id="inspect-heading" tabIndex={-1} ref={headingRef}>SELECTED EVIDENCE</h2>
-          <p>{dossier.productType}</p>
+        <div className="inspect-narrative">
+          <div className="inspect-title-block">
+            <p className="inspect-selection">SELECTED / DETERMINISTIC EVIDENCE</p>
+            <h2 id="inspect-heading" tabIndex={-1} ref={headingRef}>SELECTED EVIDENCE</h2>
+            <p>{dossier.productType}</p>
+          </div>
+          <section className="inspect-section" aria-labelledby="project-is-heading">
+            <h3 id="project-is-heading">WHAT THIS PROJECT IS</h3>
+            <p className="inspect-summary">{dossier.summary}</p>
+          </section>
+          <section className="inspect-section" aria-labelledby="why-selected-heading">
+            <h3 id="why-selected-heading">WHY IT WAS SELECTED</h3>
+            <p>{match
+              ? focus.reason
+              : "Opened manually. Evaluate requirements to see evidence-backed relevance."}</p>
+          </section>
+          {match && focus.matchedRequirements.length > 0 ? (
+            <section className="inspect-section" aria-labelledby="matched-requirements-heading" aria-label="MATCHED REQUIREMENTS">
+              <h3 id="matched-requirements-heading">MATCHED REQUIREMENTS</h3>
+              <ul className="inspect-chips">{focus.matchedRequirements.map((requirement) => <li key={requirement}>{requirement}</li>)}</ul>
+            </section>
+          ) : null}
+          {match && focus.partialRequirements.length > 0 ? (
+            <section className="inspect-section" aria-labelledby="partial-requirements-heading" aria-label="PARTIAL / RELATED EVIDENCE">
+              <h3 id="partial-requirements-heading">PARTIAL / RELATED EVIDENCE</h3>
+              <ul className="inspect-chips">{focus.partialRequirements.map((requirement) => <li key={requirement}>{requirement}</li>)}</ul>
+            </section>
+          ) : null}
+          <section className="inspect-section" aria-labelledby="highlights-heading" aria-label="VERIFIED HIGHLIGHTS">
+            <h3 id="highlights-heading">VERIFIED HIGHLIGHTS</h3>
+            <ul className="verified-highlights">
+              {dossier.verifiedHighlights.map((highlight) => <li key={highlight}>{highlight}</li>)}
+            </ul>
+          </section>
         </div>
+
         {media.length > 0 ? (
           <div className="inspect-media" role="region" aria-label={`${dossier.title} evidence media`}>
             {media.map((item, index) => (
-              <figure key={item.id} className={`inspect-media-frame inspect-media-frame--${item.role}`}>
+              <motion.figure
+                key={item.id}
+                className={`inspect-media-frame inspect-media-frame--${item.role}`}
+                layoutId={index === 0 ? `project-evidence-${dossier.id}` : undefined}
+              >
                 <img
                   src={item.src}
                   alt={item.alt}
@@ -76,52 +108,15 @@ export const ProjectEvidenceInspect = ({
                   <span>{item.caption}</span>
                   <small>USER-APPROVED VISUAL EVIDENCE · TECHNICAL CLAIMS VERIFIED SEPARATELY</small>
                 </figcaption>
-              </figure>
+              </motion.figure>
             ))}
           </div>
         ) : (
-          <div className="inspect-type-frame" aria-label={`${dossier.title} type-led evidence`}>
+          <motion.div className="inspect-type-frame" layoutId={`project-evidence-${dossier.id}`} aria-label={`${dossier.title} type-led evidence`}>
             <span aria-hidden="true">{dossier.title.slice(0, 2).toUpperCase()}</span>
             <p>TYPE-LED EVIDENCE / NO SCREENSHOT CLAIMED</p>
-          </div>
+          </motion.div>
         )}
-      </div>
-
-      <div className="inspect-layout">
-        <div className="inspect-narrative">
-          <section className="inspect-section" aria-labelledby="project-is-heading">
-            <h3 id="project-is-heading">WHAT THIS PROJECT IS</h3>
-            <p className="inspect-summary">{dossier.summary}</p>
-          </section>
-          <section className="inspect-section" aria-labelledby="why-selected-heading">
-            <h3 id="why-selected-heading">WHY IT WAS SELECTED</h3>
-            <p>{focus.reason}</p>
-          </section>
-          <section className="inspect-section" aria-labelledby="matched-requirements-heading" aria-label="MATCHED REQUIREMENTS">
-            <h3 id="matched-requirements-heading">MATCHED REQUIREMENTS</h3>
-            <ul className="inspect-chips">
-              {focus.matchedRequirements.length > 0
-                ? focus.matchedRequirements.map((requirement) => <li key={requirement}>{requirement}</li>)
-                : <li>No directly matched requirements for this selection.</li>}
-            </ul>
-          </section>
-          {focus.partialRequirements.length > 0 ? (
-            <section className="inspect-section" aria-labelledby="partial-requirements-heading" aria-label="PARTIAL / RELATED EVIDENCE">
-              <h3 id="partial-requirements-heading">PARTIAL / RELATED EVIDENCE</h3>
-              <ul className="inspect-chips">{focus.partialRequirements.map((requirement) => <li key={requirement}>{requirement}</li>)}</ul>
-            </section>
-          ) : null}
-          <section className="inspect-section" aria-labelledby="highlights-heading" aria-label="VERIFIED HIGHLIGHTS">
-            <h3 id="highlights-heading">VERIFIED HIGHLIGHTS</h3>
-            <ul className="verified-highlights">
-              {dossier.verifiedHighlights.map((highlight) => <li key={highlight}>{highlight}</li>)}
-            </ul>
-          </section>
-          <section className="inspect-section" aria-labelledby="limitations-heading">
-            <h3 id="limitations-heading">KNOWN LIMITATIONS</h3>
-            <ul>{dossier.limitations.map((limitation) => <li key={limitation}>{limitation}</li>)}</ul>
-          </section>
-        </div>
 
         <aside className="inspect-evidence-rail" aria-label="Evidence provenance">
           <dl className="inspect-facts">
@@ -129,6 +124,21 @@ export const ProjectEvidenceInspect = ({
             <div><dt>MATURITY</dt><dd>{dossier.maturityLabel}</dd></div>
             <div><dt>VERIFICATION</dt><dd>{dossier.verificationLevels.map(verificationLevelLabel).join(", ")}</dd></div>
           </dl>
+          <section className="inspect-section inspect-boundary" aria-labelledby="public-boundary-heading">
+            <h3 id="public-boundary-heading">PUBLIC / PRIVATE BOUNDARY</h3>
+            <p className="boundary-label">{projectVisibilityLabel(dossier.visibility)}</p>
+            {dossier.links.length > 0 ? (
+              <ul className="public-links">
+                {dossier.links.map((link) => <li key={link.href}><a href={link.href}>{link.label}</a></li>)}
+              </ul>
+            ) : <p>No public link is represented for this evidence record.</p>}
+          </section>
+        </aside>
+      </div>
+
+      <details className="inspect-details">
+        <summary>VIEW EVIDENCE DETAILS</summary>
+        <div className="inspect-details-layout">
           <section className="inspect-section" aria-labelledby="claims-heading">
             <h3 id="claims-heading">EVIDENCE VISIBILITY</h3>
             <ul className="evidence-claims">
@@ -142,17 +152,12 @@ export const ProjectEvidenceInspect = ({
               ))}
             </ul>
           </section>
-          <section className="inspect-section inspect-boundary" aria-labelledby="public-boundary-heading">
-            <h3 id="public-boundary-heading">PUBLIC / PRIVATE BOUNDARY</h3>
-            <p className="boundary-label">{projectVisibilityLabel(dossier.visibility)}</p>
-            {dossier.links.length > 0 ? (
-              <ul className="public-links">
-                {dossier.links.map((link) => <li key={link.href}><a href={link.href}>{link.label}</a></li>)}
-              </ul>
-            ) : <p>No public link is represented for this evidence record.</p>}
+          <section className="inspect-section" aria-labelledby="limitations-heading">
+            <h3 id="limitations-heading">KNOWN LIMITATIONS</h3>
+            <ul>{dossier.limitations.map((limitation) => <li key={limitation}>{limitation}</li>)}</ul>
           </section>
-        </aside>
-      </div>
+        </div>
+      </details>
       {match ? <button type="button" className="primary-action inspect-brief-action" onClick={createBrief}>CREATE COLLABORATION BRIEF</button> : null}
       {error ? <p role="alert" className="form-error">{error}</p> : null}
     </section>

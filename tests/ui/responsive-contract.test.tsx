@@ -6,6 +6,8 @@ import { App, resetAppForTesting } from "../../src/app/App";
 
 const shellCss = readFileSync("src/styles/shell.css", "utf8");
 const evidenceFieldCss = readFileSync("src/styles/evidence-field.css", "utf8");
+const experienceStageCss = readFileSync("src/styles/experience-stage.css", "utf8");
+const briefCss = readFileSync("src/styles/brief.css", "utf8");
 
 const setViewport = (width: number): void => {
   Object.defineProperty(window, "innerWidth", { configurable: true, value: width });
@@ -58,21 +60,30 @@ describe("responsive structural contracts", () => {
     expect(shellCss).toMatch(/transition-duration: \.01ms !important/);
   });
 
-  it("bounds the desktop composer headline before the evidence-stage column", () => {
-    // This catches the longest headline glyph run crossing into the stage at the verified 1366px desktop viewport.
-    expect(shellCss).toMatch(/\.requirement-composer h1 \{[^}]*font-size: clamp\(2\.3rem, 3\.35vw, 4\.8rem\)/);
+  it("bounds both first-viewport headings before the evidence-stage column", () => {
+    // This catches the studio thesis or composer prompt crossing into the stage at the verified desktop viewport.
+    expect(shellCss).toMatch(/\.studio-context h1 \{[^}]*font-size: clamp\(1\.65rem, 2\.2vw, 2\.75rem\)/);
+    expect(shellCss).toMatch(/\.requirement-composer h2 \{[^}]*font-size: clamp\(1\.7rem, 2\.6vw, 3\.3rem\)/);
   });
 
-  it("releases the sticky composer before the match summary spans the tablet grid", () => {
+  it("releases the sticky studio rail before the match summary spans the tablet grid", () => {
     // A sticky first column otherwise remains painted over the full-width match panel while scrolling to Inspect.
     const tabletRule = shellCss.match(/@media \(max-width: 1150px\)[\s\S]*?(?=@media \(max-width: 620px\)|$)/)?.[0] ?? "";
-    expect(tabletRule).toMatch(/\.requirement-composer \{[^}]*position: static/);
+    expect(tabletRule).toMatch(/\.studio-rail \{[^}]*position: static/);
   });
 
   it("keeps the fixed mobile summary out of focused Inspect and Brief work", () => {
     const mobileRule = shellCss.match(/@media \(max-width: 620px\)[\s\S]*?(?=@media \(prefers-reduced-motion: reduce\)|$)/)?.[0] ?? "";
     expect(mobileRule).toMatch(/\.experience--inspect \.match-compact-summary,[\s\S]*\.experience--brief \.match-compact-summary \{ display: none; \}/);
     expect(mobileRule).toMatch(/\.experience--inspect \.match-panel,[\s\S]*\.experience--brief \.match-panel \{ display: none; \}/);
+  });
+
+  it("bounds foreground modes to one viewport-stage while preserving natural mobile Brief scroll", () => {
+    expect(experienceStageCss).toMatch(/\.experience-stage--inspect,[\s\S]*\.experience-stage--brief \{[^}]*min-height: calc\(100dvh - 6\.5rem\)/);
+    expect(experienceStageCss).toMatch(/\.stage-workspace--inspect,[\s\S]*\.stage-workspace--brief \{[^}]*position: absolute;[^}]*inset: 0;[^}]*overflow: hidden/);
+    const briefMobileRule = briefCss.match(/@media \(max-width: 620px\)[\s\S]*$/)?.[0] ?? "";
+    expect(briefMobileRule).toMatch(/\.brief-surface \{[^}]*max-height: none;[^}]*overflow: visible/);
+    expect(briefCss).toMatch(/\.brief-return \{[^}]*position: sticky;[^}]*top: 0;[^}]*z-index:/);
   });
 
   it("reserves enough desktop stage depth for the seventh project and gives dark nodes a contrasting focus ring", () => {
@@ -83,6 +94,7 @@ describe("responsive structural contracts", () => {
   it("reserves mobile heading depth before the first evidence card", () => {
     const mobileRule = evidenceFieldCss.match(/@media \(max-width: 620px\)[\s\S]*?(?=@media \(prefers-reduced-motion: reduce\)|$)/)?.[0] ?? "";
     expect(mobileRule).toMatch(/\.evidence-field \{[^}]*padding: 7\.5rem \.7rem 1rem/);
+    expect(mobileRule).toMatch(/\.evidence-field \.project-node\[data-visual-form="evidence-object"\],[\s\S]*\.evidence-field \.project-node\[data-visual-form="extended-signal"\] \{[^}]*width: 100%/);
   });
 
   it("keeps the evaluated bottom row inside the 1024px desktop-edge stage", () => {

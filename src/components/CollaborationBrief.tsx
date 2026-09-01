@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import type { AgentInterface, ProjectDossier } from "../application/AgentInterface";
 import { BRIEF_REQUIREMENTS_HINT, BRIEF_REQUIREMENTS_MAX_LENGTH, parseBriefRequirements, PUBLIC_INPUT_LIMITS } from "../application/inputBounds";
 import type { CollaborationBrief as CollaborationBriefDraft } from "../domain/types";
+import { SAFE_EXTERNAL_REL, STUDIO_URL } from "../presentation/publicDestinations";
 
 type EditableField = "projectType" | "requirements" | "context" | "timeline" | "budget";
 
@@ -63,9 +64,9 @@ export const CollaborationBrief = ({
   const headingRef = useRef<HTMLHeadingElement>(null);
   const fallbackRef = useRef<HTMLTextAreaElement>(null);
 
-  useEffect(() => { headingRef.current?.focus(); }, []);
+  useLayoutEffect(() => { headingRef.current?.focus({ preventScroll: true }); }, []);
   useEffect(() => { setValues(toEditable(brief)); }, [brief]);
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (fallbackText) {
       fallbackRef.current?.focus();
       fallbackRef.current?.select();
@@ -124,13 +125,13 @@ export const CollaborationBrief = ({
 
   return (
     <section className="brief-surface" aria-labelledby="brief-heading">
+      <button type="button" className="surface-return brief-return" onClick={() => agent.close("manual")}>BACK TO EVIDENCE</button>
       <header className="brief-header">
         <div>
           <p className="eyebrow">HUMAN-CONTROLLED HANDOFF</p>
           <h2 id="brief-heading" tabIndex={-1} ref={headingRef}>PROJECT BRIEF</h2>
           <p className="brief-draft-label">EDITABLE PAGE-LOCAL WORKING DOCUMENT</p>
         </div>
-        <button type="button" className="surface-return" onClick={() => agent.close("manual")}>BACK TO EVIDENCE</button>
       </header>
       <div className="brief-authority" aria-label="Brief authority boundary">
         <strong>PAGE-LOCAL DRAFT ONLY</strong>
@@ -157,6 +158,7 @@ export const CollaborationBrief = ({
       <p className="brief-source">SOURCE MATCH: {brief.sourceMatchId}</p>
       <div className="brief-actions">
         <button type="button" className="primary-action" onClick={() => { void copy(); }}>COPY BRIEF</button>
+        <a className="brief-studio-link" href={STUDIO_URL} target="_blank" rel={SAFE_EXTERNAL_REL}>CONTINUE WITH BRENYCH STUDIO ↗</a>
       </div>
       {fallbackText ? <textarea ref={fallbackRef} className="brief-copy-fallback" aria-label="Copyable brief text" value={fallbackText} readOnly /> : null}
       {copyStatus ? <p className="copy-status" role="status" aria-live="polite">{copyStatus}</p> : null}
