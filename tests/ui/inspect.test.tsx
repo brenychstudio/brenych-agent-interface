@@ -48,14 +48,15 @@ describe("project evidence inspect", () => {
     expect(screen.getByText("VERIFICATION").parentElement).toHaveTextContent("OWNER-VERIFIED IMPLEMENTATION");
     expect(screen.getByRole("region", { name: "MATCHED REQUIREMENTS" })).toHaveTextContent("Electron");
     expect(screen.getByRole("region", { name: "VERIFIED HIGHLIGHTS" })).toHaveTextContent("Local-first development control plane");
-    expect(screen.getByText("Public-safe summary identifies an Electron desktop interface.")).toBeInTheDocument();
-    expect(screen.getAllByText(/EVIDENCE VISIBILITY:/)).not.toHaveLength(0);
-    expect(screen.getByText("Only the public-safe summary is represented.")).toBeInTheDocument();
     expect(screen.getByText("PUBLIC / PRIVATE BOUNDARY")).toBeInTheDocument();
     expect(screen.getByText("PUBLIC SUMMARY", { selector: ".boundary-label" })).toBeInTheDocument();
-    const details = screen.getByText("VIEW EVIDENCE DETAILS").closest("details");
-    expect(details).not.toHaveAttribute("open");
+    const detailsTrigger = screen.getByRole("button", { name: /VIEW EVIDENCE DETAILS/ });
+    expect(detailsTrigger).toHaveAttribute("aria-expanded", "false");
+    fireEvent.click(detailsTrigger);
+    const details = document.getElementById(detailsTrigger.getAttribute("aria-controls") ?? "");
     expect(details).toContainElement(screen.getByText("Public-safe summary identifies an Electron desktop interface."));
+    expect(screen.getAllByText(/EVIDENCE VISIBILITY:/)).not.toHaveLength(0);
+    expect(screen.getByText("Only the public-safe summary is represented.")).toBeInTheDocument();
     expect(screen.queryByText(/owner_verified_private|public_summary_only/)).not.toBeInTheDocument();
     const media = screen.getByRole("region", { name: "BDB evidence media" });
     const mediaImages = within(media).getAllByRole("img");
@@ -87,9 +88,8 @@ describe("project evidence inspect", () => {
   it("opens honest Native Site Control evidence from the index and restores that exact origin", () => {
     // This catches a latent record becoming unreachable, fabricating public UI, or restoring focus to a different button.
     render(<App />);
-    const summary = screen.getByText("FULL EVIDENCE INDEX");
-    fireEvent.click(summary);
-    const details = summary.closest("details");
+    const indexTrigger = screen.getByRole("button", { name: /FULL EVIDENCE INDEX/ });
+    fireEvent.click(indexTrigger);
     const origin = screen.getByRole("button", { name: "Open Native Site Control evidence record" });
     fireEvent.click(origin);
 
@@ -114,7 +114,7 @@ describe("project evidence inspect", () => {
     fireEvent.keyDown(document, { key: "Escape" });
 
     expect(origin).toHaveFocus();
-    expect(details).toHaveAttribute("open");
+    expect(screen.getByRole("button", { name: /FULL EVIDENCE INDEX/ })).toHaveAttribute("aria-expanded", "true");
   });
 
   it("restores the pre-inspect page position and originating focus without an automatic scroll", () => {
@@ -209,7 +209,7 @@ describe("project evidence inspect", () => {
       expect(within(rail).getByText(term).tagName).toBe("DT");
     });
     expect(within(rail).getByText("PUBLIC / PRIVATE BOUNDARY")).toBeInTheDocument();
-    expect(screen.getByText("VIEW EVIDENCE DETAILS").closest("details")).not.toHaveAttribute("open");
+    expect(screen.getByRole("button", { name: /VIEW EVIDENCE DETAILS/ })).toHaveAttribute("aria-expanded", "false");
   });
 
   it("offers a live continuation only where the evidence record already holds a verified site", () => {

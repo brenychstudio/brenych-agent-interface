@@ -10,16 +10,17 @@ export const MatchPanel = ({ result, dossiers }: { readonly result: MatchResult;
     <p className="eyebrow">EVIDENCE-BACKED FIT</p>
     <h2 id="fit-heading">{result.labels.coverage}</h2>
     <p className="coverage-value">{Math.round(result.evidenceCoverage * 100)}%</p>
-    <p className="confidence">Confidence: {result.evidenceConfidence}</p>
+    {/* The engine is deterministic evidence matching, never a probability about future success. */}
+    <p className="evidence-model">EVIDENCE MODEL: DETERMINISTIC</p>
     <div className="coverage-counts" aria-label="Requirement coverage counts">
-      <span><strong>{result.matched.length}</strong> MATCHED</span>
+      <span><strong>{result.matched.length} / {result.requirements.length}</strong> REQUIREMENTS MATCHED</span>
       <span><strong>{result.partial.length}</strong> RELATED</span>
       <span><strong>{result.missing.length}</strong> NOT DEMONSTRATED</span>
     </div>
     <div className="match-compact-summary" aria-hidden="true">
       <span>MATCH SUMMARY</span>
       <strong>{Math.round(result.evidenceCoverage * 100)}%</strong>
-      <span>{result.matched.length} MATCHED / {result.partial.length} RELATED / {result.missing.length} MISSING</span>
+      <span>{result.matched.length}/{result.requirements.length} REQUIREMENTS MATCHED · {result.partial.length} RELATED · {result.missing.length} NOT DEMONSTRATED</span>
     </div>
     <section className="strongest-evidence" aria-labelledby="strongest-evidence-heading">
       <h3 id="strongest-evidence-heading">STRONGEST EVIDENCE</h3>

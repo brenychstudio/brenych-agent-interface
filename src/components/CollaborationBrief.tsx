@@ -64,7 +64,8 @@ export const CollaborationBrief = ({
   const headingRef = useRef<HTMLHeadingElement>(null);
   const fallbackRef = useRef<HTMLTextAreaElement>(null);
 
-  useLayoutEffect(() => { headingRef.current?.focus(); }, []);
+  // The App establishes the canonical entry position; focus must not scroll it away again.
+  useLayoutEffect(() => { headingRef.current?.focus({ preventScroll: true }); }, []);
   useEffect(() => { setValues(toEditable(brief)); }, [brief]);
   useLayoutEffect(() => {
     if (fallbackText) {

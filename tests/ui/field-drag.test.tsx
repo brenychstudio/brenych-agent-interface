@@ -83,15 +83,15 @@ describe("bounded evidence-field navigation", () => {
     // This catches the disclosure summary starting a field drag or inheriting pointer movement as pan.
     render(<App />);
     const field = screen.getByTestId("evidence-field");
-    const summary = screen.getByText("FULL EVIDENCE INDEX");
+    const trigger = screen.getByRole("button", { name: /FULL EVIDENCE INDEX/ });
 
-    fireEvent.pointerDown(summary, { pointerId: 12, pointerType: "mouse", clientX: 100, clientY: 100 });
+    fireEvent.pointerDown(trigger, { pointerId: 12, pointerType: "mouse", clientX: 100, clientY: 100 });
     fireEvent.pointerMove(field, { pointerId: 12, pointerType: "mouse", clientX: 500, clientY: 500 });
     fireEvent.pointerUp(field, { pointerId: 12, pointerType: "mouse", clientX: 500, clientY: 500 });
-    fireEvent.click(summary);
+    fireEvent.click(trigger);
     await flushFrame();
 
-    expect(summary.closest("details")).toHaveAttribute("open");
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
     expect(field).toHaveAttribute("data-pan-x", "0");
     expect(field).toHaveAttribute("data-pan-y", "0");
   });

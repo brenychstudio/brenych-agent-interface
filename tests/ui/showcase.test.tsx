@@ -6,6 +6,7 @@ import { readFileSync } from "node:fs";
 import { App, resetAppForTesting } from "../../src/app/App";
 
 const showcaseCss = readFileSync("src/styles/showcase.css", "utf8");
+const chapterSource = readFileSync("src/components/ShowcaseProofChapter.tsx", "utf8");
 
 afterEach(() => { cleanup(); resetAppForTesting(); });
 
@@ -120,5 +121,47 @@ describe("supporting studio proof layer", () => {
     expect(showcaseCss).toMatch(/\.showcase-frame img \{[^}]*height: auto;[^}]*object-fit: contain;[^}]*object-position: center/);
     expect(showcaseCss).not.toMatch(/object-fit:\s*cover/);
     expect(showcaseCss).not.toMatch(/aspect-ratio:\s*16\s*\/\s*10/);
+  });
+
+  it("separates a time-based entry reveal from continuous scroll parallax", () => {
+    // Continuous parallax alone is imperceptible: a chapter passes through ~1500px of scrolling, so
+    // even a 60px range moves a cover ~3px per 100px scrolled. This catches the entry reveal being
+    // removed, replaced by React scroll state, or folded back onto the same element as the parallax.
+    expect(chapterSource).toMatch(/useScroll\(/);
+    expect(chapterSource).toMatch(/useTransform\(/);
+    expect(chapterSource).not.toMatch(/onScroll/);
+    expect(chapterSource).not.toMatch(/addEventListener\(\s*"scroll"/);
+    // Scroll progress must never be routed into React state. A chapter may hold other presentation
+    // state (it freezes its planes while the media viewer owns the screen), so the ban is specific
+    // to scroll rather than to state in general.
+    expect(chapterSource).not.toMatch(/set\w*\([^)]*scrollYProgress/);
+    expect(chapterSource).not.toMatch(/scrollYProgress\.on\(/);
+    expect(chapterSource).not.toMatch(/useMotionValueEvent/);
+
+    // The reveal is time-based and viewport-triggered, and runs once rather than replaying.
+    expect(chapterSource).toMatch(/whileInView/);
+    expect(chapterSource).toMatch(/viewport: \{ once: true, amount: \.\d+ \}/);
+    const amount = Number(chapterSource.match(/amount: (\.\d+)/)?.[1]);
+    expect(amount).toBeGreaterThanOrEqual(.15);
+    expect(amount).toBeLessThanOrEqual(.25);
+
+    // Two planes, never one element owning both systems.
+    expect(chapterSource).toMatch(/className="showcase-plane"/);
+  });
+
+  it("gives every chapter both an entry plane and a scroll-linked outer plane", () => {
+    // This catches the wrapper being dropped so the reveal silently stops rendering.
+    render(<App />);
+    const showcase = screen.getByRole("region", { name: "Selected studio systems" });
+    const chapters = within(showcase).getAllByRole("article");
+
+    chapters.forEach((chapter) => {
+      const frames = chapter.querySelectorAll(".showcase-frame");
+      expect(frames).toHaveLength(2);
+      frames.forEach((frame) => {
+        expect(frame.querySelector(".showcase-plane")).not.toBeNull();
+        expect(frame.querySelector(".showcase-plane .media-open")).not.toBeNull();
+      });
+    });
   });
 });

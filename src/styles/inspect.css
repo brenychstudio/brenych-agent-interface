@@ -158,8 +158,8 @@
 .inspect-brief-action { margin-top: 2rem; }
 
 .inspect-details { margin-top: clamp(1.5rem, 3vw, 3rem); border-block: 1px solid var(--ink); }
-.inspect-details summary { cursor: pointer; padding: 1rem 0; font: 600 .66rem var(--mono); letter-spacing: .08em; }
-.inspect-details summary:focus-visible { outline: 2px solid var(--ink); outline-offset: .25rem; }
+.inspect-details .disclosure-trigger { padding: 1rem 0; font: 600 .66rem var(--mono); letter-spacing: .08em; }
+.inspect-details .disclosure-trigger:focus-visible { outline: 2px solid var(--ink); outline-offset: .25rem; }
 .inspect-details-layout { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(15rem, .7fr); gap: clamp(1.5rem, 4vw, 4rem); padding: 0 0 1.5rem; }
 
 @media (max-width: 1100px) {

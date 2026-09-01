@@ -86,7 +86,7 @@ describe("cinematic media inspect", () => {
     expect(image.closest("[data-layout-id]"))?.toHaveAttribute("data-layout-id", `media-inspect-${id}`);
 
     fireEvent.click(within(dialog).getByRole("button", { name: "Close media viewer" }));
-    await waitFor(() => expect(screen.queryByRole("dialog", { name: "BDB" })).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole("dialog", { name: "BDB" })).not.toBeInTheDocument(), { timeout: 4000 });
   });
 
   it("keeps showcase navigation inside the selected system and wraps in both directions", async () => {
@@ -121,7 +121,7 @@ describe("cinematic media inspect", () => {
     expect(screen.getByRole("dialog", { name: "BDB" })).toBeInTheDocument();
 
     fireEvent.keyDown(document, { key: "Escape" });
-    await waitFor(() => expect(screen.queryByRole("dialog", { name: "BDB" })).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole("dialog", { name: "BDB" })).not.toBeInTheDocument(), { timeout: 4000 });
     expect(screen.getByRole("region", { name: "BDB evidence inspect" })).toBeInTheDocument();
     expect(trigger).toHaveFocus();
 
@@ -189,7 +189,7 @@ describe("cinematic media inspect", () => {
     expect(document.body.style.left).toBe("-12px");
 
     fireEvent.click(within(dialog).getByRole("button", { name: "Close media viewer" }));
-    await waitFor(() => expect(screen.queryByRole("dialog", { name: "BDB" })).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole("dialog", { name: "BDB" })).not.toBeInTheDocument(), { timeout: 4000 });
 
     expect(root).not.toHaveAttribute("inert");
     expect(document.body.hasAttribute("style")).toBe(false);
@@ -210,7 +210,7 @@ describe("cinematic media inspect", () => {
     expect(document.body.style.overflow).toBe("hidden");
 
     fireEvent.click(within(dialog).getByRole("button", { name: "Close media viewer" }));
-    await waitFor(() => expect(screen.queryByRole("dialog", { name: "BDB" })).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole("dialog", { name: "BDB" })).not.toBeInTheDocument(), { timeout: 4000 });
 
     expect(root).toHaveAttribute("inert");
     expect(document.body.style.overflow).toBe("auto");

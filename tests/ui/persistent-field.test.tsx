@@ -5,6 +5,16 @@ import { afterEach, describe, expect, it } from "vitest";
 import { App, resetAppForTesting } from "../../src/app/App";
 
 const evidenceFieldCss = readFileSync("src/styles/evidence-field.css", "utf8");
+
+// The evidence index is an animated disclosure: its records exist only while the panel is open.
+const openEvidenceIndex = (): HTMLElement => {
+  const trigger = screen.getByRole("button", { name: /FULL EVIDENCE INDEX/ });
+  if (trigger.getAttribute("aria-expanded") !== "true") fireEvent.click(trigger);
+  const panel = document.getElementById(trigger.getAttribute("aria-controls") ?? "");
+  if (!panel) throw new Error("full evidence index panel is missing");
+  return panel;
+};
+
 const evidenceFieldSource = readFileSync("src/components/EvidenceField.tsx", "utf8");
 const projectNodeSource = readFileSync("src/components/ProjectNode.tsx", "utf8");
 const packageJson = JSON.parse(readFileSync("package.json", "utf8")) as {
@@ -23,7 +33,7 @@ describe("persistent evidence field", () => {
     const initialNodes = within(camera).getAllByRole("button", { name: /Project / });
     expect(initialNodes).toHaveLength(6);
     expect(initialNodes.every((node) => !/rank|foreground|receded/i.test(node.getAttribute("aria-label") ?? ""))).toBe(true);
-    expect(screen.getAllByRole("button", { name: /Open .* evidence record/, hidden: true })).toHaveLength(7);
+    expect(within(openEvidenceIndex()).getAllByRole("button", { name: /Open .* evidence record/ })).toHaveLength(7);
     expect(screen.getByText("UNEVALUATED EVIDENCE FIELD")).toBeInTheDocument();
     expect(screen.queryByText("FIELD · NOT EVALUATED")).not.toBeInTheDocument();
 
@@ -33,7 +43,7 @@ describe("persistent evidence field", () => {
 
     expect(within(camera).getAllByRole("button", { name: /Project / })).toHaveLength(6);
     expect(within(camera).getAllByRole("button", { name: /Project / }).every((node) => !/rank|foreground|receded/i.test(node.getAttribute("aria-label") ?? ""))).toBe(true);
-    expect(screen.getAllByRole("button", { name: /Open .* evidence record/, hidden: true })).toHaveLength(7);
+    expect(within(openEvidenceIndex()).getAllByRole("button", { name: /Open .* evidence record/ })).toHaveLength(7);
     expect(screen.getByText("UNEVALUATED EVIDENCE FIELD")).toBeInTheDocument();
   });
 
@@ -56,7 +66,9 @@ describe("persistent evidence field", () => {
     expect(evidenceFieldCss).toMatch(/\.evidence-field \{[\s\S]*min-height: 74rem;[\s\S]*perspective: 850px;/);
     expect(camera).toContainElement(constellation.getByRole("button", { name: /Project BDB/ }));
     expect(camera).toContainElement(constellation.getByRole("button", { name: /Project Presence OS Memory Atlas/ }));
-    expect(camera).not.toContainElement(screen.getByRole("button", { name: "Open Native Site Control evidence record", hidden: true }));
+    expect(camera).not.toContainElement(
+      within(openEvidenceIndex()).getByRole("button", { name: "Open Native Site Control evidence record" }),
+    );
     expect(tabletRule).toMatch(/\.evidence-field \{[\s\S]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);[\s\S]*perspective: none;/);
     expect(tabletRule).toMatch(/\.project-node,[\s\S]*position: relative;[\s\S]*width: 100%;[\s\S]*translate3d\(0, 0, 0\) scale\(1\)/);
     expect(tabletRule).toMatch(/\.project-node,[\s\S]*order: var\(--node-order\)/);
@@ -113,8 +125,8 @@ describe("persistent evidence field", () => {
     const camera = screen.getByTestId("evidence-field").querySelector<HTMLElement>(".field-camera");
     if (!camera) throw new Error("field camera is missing");
     expect(within(camera).getAllByRole("button", { name: /Project / })).toHaveLength(6);
-    expect(screen.getAllByRole("button", { name: /Open .* evidence record/, hidden: true })).toHaveLength(7);
-    expect(screen.getByRole("button", { name: "Open Native Site Control evidence record", hidden: true })).toBeInTheDocument();
+    expect(within(openEvidenceIndex()).getAllByRole("button", { name: /Open .* evidence record/ })).toHaveLength(7);
+    expect(within(openEvidenceIndex()).getByRole("button", { name: "Open Native Site Control evidence record" })).toBeInTheDocument();
   });
 
   it("recedes unmatched nodes when a narrow evaluation has a single leading match", () => {

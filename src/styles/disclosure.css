@@ -1,0 +1,33 @@
+/* Shared quiet disclosure. Height is animated by Motion, so the panel only owns overflow. */
+.disclosure { min-width: 0; }
+
+.disclosure-trigger {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 1rem 0;
+  color: inherit;
+  font: 600 .66rem var(--mono);
+  letter-spacing: .08em;
+  text-align: left;
+}
+.disclosure-trigger:focus-visible { outline: 2px solid currentColor; outline-offset: .25rem; }
+
+.disclosure-indicator {
+  display: inline-block;
+  flex: none;
+  font-size: .8rem;
+  line-height: 1;
+  transform-origin: 50% 50%;
+}
+
+.disclosure-panel { overflow: hidden; }
+.disclosure-panel-inner { padding-bottom: 1.5rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  .disclosure-indicator,
+  .disclosure-panel { transition: none !important; animation: none !important; }
+}

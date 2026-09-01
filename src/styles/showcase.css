@@ -1,5 +1,9 @@
 .showcase-layer {
   position: relative;
+  /* The secondary plane travels horizontally as it enters. Clipping (not hidden, so no scroll
+     container and no sticky side effects) keeps that excursion from widening the document on
+     narrow screens, where the frames are full-width and have no side room to move into. */
+  overflow-x: clip;
   margin: clamp(3rem, 9vw, 9rem) 0;
   border-top: 1px solid var(--ink);
   transition: opacity .24s ease, filter .24s ease;
@@ -21,6 +25,7 @@
 .showcase-frame { margin: 0; border: 1px solid var(--line); background: var(--paper-deep); }
 /* Showcase screenshots are complete interface evidence: never cropped, never forced to a ratio. */
 .showcase-frame img { display: block; width: 100%; height: auto; object-fit: contain; object-position: center; }
+.showcase-plane { display: block; }
 .showcase-frame figcaption { padding: .5rem .65rem; color: var(--muted); font: .58rem/1.4 var(--mono); letter-spacing: .05em; text-transform: uppercase; }
 .showcase-frame--primary { width: 89%; }
 .showcase-frame--secondary {
@@ -80,6 +85,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .showcase-layer,
-  .showcase-frame { transition: none; }
-  .showcase-frame { transform: none !important; opacity: 1 !important; }
+  .showcase-frame,
+  .showcase-plane { transition: none; animation: none; }
+  .showcase-frame,
+  .showcase-plane { transform: none !important; opacity: 1 !important; }
 }

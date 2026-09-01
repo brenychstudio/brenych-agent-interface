@@ -1,4 +1,4 @@
-import { act, cleanup, render, screen, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { App, resetAppForTesting } from "../../src/app/App";
@@ -49,7 +49,44 @@ describe("Brenych Studio public identity", () => {
       });
     });
 
-    expect(status).toHaveTextContent("AGENT TOOLS ONLINE");
+    expect(status).toHaveTextContent("WEBMCP CONNECTED · AGENT TOOLS ONLINE");
     expect(status).not.toHaveTextContent("MANUAL MODE");
+  });
+
+  it.each([
+    ["unavailable" as const, "MANUAL MODE"],
+    ["error" as const, "MANUAL MODE"],
+    ["registering" as const, "CONNECTING TO WEBMCP HOST"],
+    ["idle" as const, "CHECKING FOR WEBMCP HOST"],
+  ])("never claims a WebMCP connection while the host state is %s", (registrationState, expected) => {
+    // This catches the challenge indicator advertising a live agent connection before one exists.
+    render(<App />);
+
+    act(() => {
+      useAppStore.getState().apply({
+        type: "registration_changed",
+        webMcpAvailable: registrationState !== "unavailable",
+        registrationState,
+        provenance: "webmcp",
+      });
+    });
+
+    const status = screen.getByLabelText("WebMCP host status");
+    expect(status).toHaveTextContent(expected);
+    expect(status).not.toHaveTextContent("WEBMCP CONNECTED");
+    expect(status).toHaveAttribute("data-registration-state", registrationState);
+  });
+
+  it("keeps the manual browser fallback usable when no host is present", () => {
+    // This catches the ready-state presentation work removing the product's manual path.
+    render(<App />);
+
+    expect(screen.getByLabelText("WebMCP host status")).toHaveTextContent("MANUAL MODE");
+    fireEvent.click(screen.getByRole("button", { name: "Add Electron" }));
+    fireEvent.click(screen.getByRole("button", { name: "EVALUATE EVIDENCE" }));
+
+    expect(screen.getByText("EVIDENCE COVERAGE")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Project BDB/ }));
+    expect(screen.getByRole("heading", { name: "BDB", level: 2 })).toBeInTheDocument();
   });
 });

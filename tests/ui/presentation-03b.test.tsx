@@ -62,8 +62,10 @@ describe("03B full-bleed presentation", () => {
     expect(screen.queryByRole("region", { name: "BDB evidence inspect" })).not.toBeInTheDocument();
   });
 
-  it("lets the browser reveal the newly focused Inspect heading on entry", () => {
-    // This catches Inspect suppressing the browser scroll needed to reveal its h2 after opening from a scrolled Evidence Field.
+  it("establishes a canonical Inspect entry position instead of inheriting the workspace scroll", () => {
+    // This catches the studio header or the project heading starting above the viewport when a
+    // project is opened from a deeply scrolled Evidence workspace.
+    const scrollTo = vi.spyOn(window, "scrollTo").mockImplementation(() => undefined);
     Object.defineProperty(window, "scrollY", { configurable: true, value: 420 });
     const focus = vi.spyOn(HTMLElement.prototype, "focus");
     render(<App />);
@@ -71,24 +73,31 @@ describe("03B full-bleed presentation", () => {
     openBdbInspect();
 
     const heading = screen.getByRole("heading", { name: "BDB", level: 2 });
+    expect(scrollTo).toHaveBeenCalledWith({ left: 0, top: 0, behavior: "instant" });
+    expect(heading).toHaveFocus();
+    // Focus must not scroll the canonical position away again.
     const headingFocusCall = focus.mock.contexts.findIndex((context) => context === heading);
     expect(headingFocusCall).toBeGreaterThanOrEqual(0);
-    expect(focus.mock.calls[headingFocusCall]?.[0]).not.toEqual(expect.objectContaining({ preventScroll: true }));
+    expect(focus.mock.calls[headingFocusCall]?.[0]).toEqual(expect.objectContaining({ preventScroll: true }));
   });
 
-  it("lets the browser reveal the newly focused Brief heading on entry", () => {
-    // This catches Brief suppressing the browser scroll needed to reveal its h2 after creation from a scrolled Inspect document.
+  it("establishes a canonical Brief entry position instead of inheriting the Inspect scroll", () => {
+    // This catches Brief opening part-way down the page after a long Inspect read.
+    const scrollTo = vi.spyOn(window, "scrollTo").mockImplementation(() => undefined);
     const focus = vi.spyOn(HTMLElement.prototype, "focus");
     render(<App />);
     openBdbInspect();
     focus.mockClear();
+    scrollTo.mockClear();
     Object.defineProperty(window, "scrollY", { configurable: true, value: 860 });
 
     fireEvent.click(screen.getByRole("button", { name: "CREATE COLLABORATION BRIEF" }));
 
     const heading = screen.getByRole("heading", { name: "PROJECT BRIEF", level: 2 });
+    expect(scrollTo).toHaveBeenCalledWith({ left: 0, top: 0, behavior: "instant" });
+    expect(heading).toHaveFocus();
     const headingFocusCall = focus.mock.contexts.findIndex((context) => context === heading);
     expect(headingFocusCall).toBeGreaterThanOrEqual(0);
-    expect(focus.mock.calls[headingFocusCall]?.[0]).not.toEqual(expect.objectContaining({ preventScroll: true }));
+    expect(focus.mock.calls[headingFocusCall]?.[0]).toEqual(expect.objectContaining({ preventScroll: true }));
   });
 });

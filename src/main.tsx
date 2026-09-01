@@ -11,6 +11,7 @@ import "./styles/inspect.css";
 import "./styles/brief.css";
 import "./styles/showcase.css";
 import "./styles/media-inspect.css";
+import "./styles/disclosure.css";
 
 const root = document.getElementById("root");
 if (!root) throw new Error("Root element is missing");

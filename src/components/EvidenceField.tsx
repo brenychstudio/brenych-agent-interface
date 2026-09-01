@@ -6,6 +6,7 @@ import type { SemanticAction } from "../application/StatePort";
 import type { ProjectId } from "../domain/types";
 import type { CapabilityTrace, ProjectNodeState } from "../state/selectors";
 
+import { AnimatedDisclosure } from "./AnimatedDisclosure";
 import { CapabilityConnections } from "./CapabilityConnections";
 import { ProjectNode } from "./ProjectNode";
 
@@ -41,7 +42,6 @@ export const EvidenceField = ({
 }) => {
   const [dragging, setDragging] = useState(false);
   const [hoveredProjectId, setHoveredProjectId] = useState<ProjectId | null>(null);
-  const [indexOpen, setIndexOpen] = useState(false);
   const drag = useRef<DragState | null>(null);
   const fieldRef = useRef<HTMLElement>(null);
   const cameraRef = useRef<HTMLDivElement>(null);
@@ -110,7 +110,7 @@ export const EvidenceField = ({
 
   const startDrag = (event: ReactPointerEvent<HTMLElement>): void => {
     const target = event.target;
-    if (!pointerMotionAllowed(event) || (target instanceof Element && target.closest("button, details, summary, a"))) return;
+    if (!pointerMotionAllowed(event) || (target instanceof Element && target.closest("button, a, [role=\"region\"]"))) return;
     drag.current = {
       pointerId: event.pointerId,
       originX: event.clientX,
@@ -235,31 +235,30 @@ export const EvidenceField = ({
           ) : null;
         })}
       </motion.div>
-      <details
-        className="evidence-index"
-        onPointerDown={(event) => event.stopPropagation()}
-        onToggle={(event) => setIndexOpen(event.currentTarget.open)}
-      >
-        <summary onClick={(event) => setIndexOpen(!event.currentTarget.closest<HTMLDetailsElement>("details")?.open)}>FULL EVIDENCE INDEX</summary>
-        <p>7 VERIFIED PROJECT RECORDS</p>
-        <div className="evidence-index-list" aria-hidden={indexOpen ? undefined : true}>
-          {dossiers.map((dossier) => (
-            <button
-              key={dossier.id}
-              type="button"
-              data-project-id={dossier.id}
-              aria-label={`Open ${dossier.title} evidence record`}
-              onClick={(event) => {
-                onProjectFocus?.(event.currentTarget);
-                agent.focusProject({ projectId: dossier.id }, "manual");
-              }}
-            >
-              <span>{dossier.title}</span>
-              <span>OPEN ↗</span>
-            </button>
-          ))}
-        </div>
-      </details>
+      <div className="evidence-index" onPointerDown={(event) => event.stopPropagation()}>
+        <AnimatedDisclosure
+          label="FULL EVIDENCE INDEX"
+          meta={<p className="evidence-index-count">7 VERIFIED PROJECT RECORDS</p>}
+        >
+          <div className="evidence-index-list">
+            {dossiers.map((dossier) => (
+              <button
+                key={dossier.id}
+                type="button"
+                data-project-id={dossier.id}
+                aria-label={`Open ${dossier.title} evidence record`}
+                onClick={(event) => {
+                  onProjectFocus?.(event.currentTarget);
+                  agent.focusProject({ projectId: dossier.id }, "manual");
+                }}
+              >
+                <span>{dossier.title}</span>
+                <span>OPEN ↗</span>
+              </button>
+            ))}
+          </div>
+        </AnimatedDisclosure>
+      </div>
     </section>
   );
 };

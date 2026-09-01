@@ -5,9 +5,11 @@ import { ShowcaseProofChapter } from "./ShowcaseProofChapter";
 
 export const ShowcaseProofLayer = ({
   mode,
+  mediaViewerOpen = false,
   onMediaInspect,
 }: {
   readonly mode: "field" | "match";
+  readonly mediaViewerOpen?: boolean;
   readonly onMediaInspect?: (request: MediaInspectRequest) => void;
 }) => (
   <section
@@ -30,6 +32,7 @@ export const ShowcaseProofLayer = ({
           proof={proof}
           index={index}
           mode={mode}
+          frozen={mediaViewerOpen}
           onMediaInspect={onMediaInspect}
           media={proof.mediaIds.flatMap((id) => {
             const item = evidenceMedia.find((candidate) => candidate.id === id);

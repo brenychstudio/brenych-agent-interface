@@ -4,11 +4,20 @@
   inset: 0;
   z-index: 200;
   overscroll-behavior: contain;
-  background: color-mix(in srgb, var(--stage-deep) 94%, transparent);
   color: var(--stage-ink);
 }
 
+/* A separate layer so the environment can rise on its own while the screenshot travels. */
+.media-inspect-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: color-mix(in srgb, var(--stage-deep) 94%, transparent);
+}
+
 .media-inspect-dialog {
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
   width: 100%;

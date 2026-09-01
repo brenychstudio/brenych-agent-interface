@@ -81,14 +81,13 @@
   color: var(--stage-ink);
 }
 
-.evidence-index summary {
-  cursor: pointer;
+.evidence-index .disclosure-trigger {
   padding: .75rem;
   font: 600 .62rem var(--mono);
   letter-spacing: .09em;
 }
 
-.evidence-index > p {
+.evidence-index-count {
   margin: 0;
   border-top: 1px solid var(--stage-line);
   padding: .55rem .75rem;
@@ -97,6 +96,7 @@
   letter-spacing: .07em;
 }
 
+.evidence-index .disclosure-panel-inner { padding: 0; }
 .evidence-index-list { display: grid; }
 .evidence-index-list button {
   display: flex;

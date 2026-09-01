@@ -5,6 +5,16 @@ import { App, resetAppForTesting } from "../../src/app/App";
 
 afterEach(() => { cleanup(); resetAppForTesting(); });
 
+// The evidence index is an animated disclosure: its records exist only while the panel is open.
+const openEvidenceIndex = (): HTMLElement => {
+  const trigger = screen.getByRole("button", { name: /FULL EVIDENCE INDEX/ });
+  if (trigger.getAttribute("aria-expanded") !== "true") fireEvent.click(trigger);
+  const panel = document.getElementById(trigger.getAttribute("aria-controls") ?? "");
+  if (!panel) throw new Error("full evidence index panel is missing");
+  return panel;
+};
+
+
 describe("real media evidence nodes", () => {
   it("uses approved media for four objects, two signals, and a closed seven-record index", () => {
     // This catches the latent NSC record appearing by default or becoming unreachable outside the constellation.
@@ -45,12 +55,15 @@ describe("real media evidence nodes", () => {
     expect(constellation.getAllByRole("button", { name: /Project / })).toHaveLength(6);
     expect(constellation.queryByRole("button", { name: /Project Native Site Control/ })).not.toBeInTheDocument();
 
-    const index = screen.getByText("FULL EVIDENCE INDEX").closest("details");
-    if (!index) throw new Error("full evidence index is missing");
-    expect(index).not.toHaveAttribute("open");
-    expect(within(index).getByText("7 VERIFIED PROJECT RECORDS")).toBeInTheDocument();
-    expect(within(index).getAllByRole("button", { hidden: true })).toHaveLength(7);
-    expect(within(index).getByRole("button", { name: "Open Native Site Control evidence record", hidden: true }))
+    const indexTrigger = screen.getByRole("button", { name: /FULL EVIDENCE INDEX/ });
+    expect(indexTrigger).toHaveAttribute("aria-expanded", "false");
+    expect(screen.getByText("7 VERIFIED PROJECT RECORDS")).toBeInTheDocument();
+    // Closed, the latent records are absent from the document and therefore from the tab order.
+    expect(screen.queryAllByRole("button", { name: /Open .* evidence record/, hidden: true })).toHaveLength(0);
+
+    const index = openEvidenceIndex();
+    expect(within(index).getAllByRole("button")).toHaveLength(7);
+    expect(within(index).getByRole("button", { name: "Open Native Site Control evidence record" }))
       .toHaveAttribute("data-project-id", "native-site-control");
   });
 

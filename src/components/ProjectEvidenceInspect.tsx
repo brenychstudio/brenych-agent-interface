@@ -12,6 +12,7 @@ import { mediaForOwner } from "../presentation/evidenceMedia";
 import { projectLiveUrl } from "../presentation/projectLinks";
 import { SAFE_EXTERNAL_REL } from "../presentation/publicDestinations";
 import type { FocusedProjectContext } from "../state/selectors";
+import { AnimatedDisclosure } from "./AnimatedDisclosure";
 import type { MediaInspectRequest } from "./CinematicMediaInspect";
 
 const nativeSiteControlFoundation = [
@@ -51,7 +52,8 @@ export const ProjectEvidenceInspect = ({
     ...new Set(dossier.evidence.map((evidence) => evidenceVisibilityLabel(evidence.visibility))),
   ].join(", ") || "NOT REPRESENTED";
 
-  useEffect(() => { headingRef.current?.focus(); }, []);
+  // The App establishes the canonical entry position; focus must not scroll it away again.
+  useEffect(() => { headingRef.current?.focus({ preventScroll: true }); }, []);
 
   const createBrief = (): void => {
     if (!match) return;
@@ -92,7 +94,7 @@ export const ProjectEvidenceInspect = ({
                 data-entry-layout-id={index === 0 ? `project-evidence-${dossier.id}` : undefined}
                 layoutId={index === 0 ? `project-evidence-${dossier.id}` : undefined}
               >
-                <button
+                <motion.button
                   type="button"
                   className="media-open"
                   data-layout-id={`media-inspect-${item.id}`}
@@ -116,7 +118,7 @@ export const ProjectEvidenceInspect = ({
                     decoding="async"
                   />
                   <span className="media-open-label" aria-hidden="true">VIEW FULL INTERFACE ↗</span>
-                </button>
+                </motion.button>
                 <figcaption>
                   <span>{item.caption}</span>
                   <small>USER-APPROVED VISUAL EVIDENCE · TECHNICAL CLAIMS VERIFIED SEPARATELY</small>
@@ -210,28 +212,29 @@ export const ProjectEvidenceInspect = ({
         ) : null}
       </aside>
 
-      <details className="inspect-details">
-        <summary>VIEW EVIDENCE DETAILS</summary>
-        <div className="inspect-details-layout">
-          <section className="inspect-section" aria-labelledby="claims-heading">
-            <h3 id="claims-heading">EVIDENCE VISIBILITY</h3>
-            <ul className="evidence-claims">
-              {dossier.evidence.map((evidence) => (
-                <li key={evidence.id}>
-                  <p>{evidence.claim}</p>
-                  <p className="evidence-provenance">EVIDENCE VISIBILITY: {evidenceVisibilityLabel(evidence.visibility)}</p>
-                  <p className="evidence-provenance">VERIFICATION: {verificationLevelLabel(evidence.verificationLevel)}</p>
-                  <p className="evidence-provenance">SOURCE: {evidence.sourceLabel}{evidence.sourceReference ? ` — ${evidence.sourceReference}` : ""}</p>
-                </li>
-              ))}
-            </ul>
-          </section>
-          <section className="inspect-section" aria-labelledby="limitations-heading">
-            <h3 id="limitations-heading">KNOWN LIMITATIONS</h3>
-            <ul>{dossier.limitations.map((limitation) => <li key={limitation}>{limitation}</li>)}</ul>
-          </section>
-        </div>
-      </details>
+      <div className="inspect-details">
+        <AnimatedDisclosure label="VIEW EVIDENCE DETAILS" panelClassName="inspect-details-panel">
+          <div className="inspect-details-layout">
+            <section className="inspect-section" aria-labelledby="claims-heading">
+              <h3 id="claims-heading">EVIDENCE VISIBILITY</h3>
+              <ul className="evidence-claims">
+                {dossier.evidence.map((evidence) => (
+                  <li key={evidence.id}>
+                    <p>{evidence.claim}</p>
+                    <p className="evidence-provenance">EVIDENCE VISIBILITY: {evidenceVisibilityLabel(evidence.visibility)}</p>
+                    <p className="evidence-provenance">VERIFICATION: {verificationLevelLabel(evidence.verificationLevel)}</p>
+                    <p className="evidence-provenance">SOURCE: {evidence.sourceLabel}{evidence.sourceReference ? ` — ${evidence.sourceReference}` : ""}</p>
+                  </li>
+                ))}
+              </ul>
+            </section>
+            <section className="inspect-section" aria-labelledby="limitations-heading">
+              <h3 id="limitations-heading">KNOWN LIMITATIONS</h3>
+              <ul>{dossier.limitations.map((limitation) => <li key={limitation}>{limitation}</li>)}</ul>
+            </section>
+          </div>
+        </AnimatedDisclosure>
+      </div>
       {match ? <button type="button" className="primary-action inspect-brief-action" onClick={createBrief}>CREATE COLLABORATION BRIEF</button> : null}
       {error ? <p role="alert" className="form-error">{error}</p> : null}
     </section>
