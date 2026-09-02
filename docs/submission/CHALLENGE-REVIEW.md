@@ -1,115 +1,111 @@
-# Provisional Challenge Criteria Review
+# Challenge Criteria Review
 
-Review date: **2026-08-31**
+Review date: **2026-09-02**
+Subject: certified runtime `cf7fc81c7b7829c1adecb9ee4c215cbaeda61ac6` at
+`https://brenych-agent-interface.pages.dev/`
 
-Status: **provisional release review**. Scores reflect the current local product and source evidence. They must be revisited after the public deployment, real Chrome WebMCP execution, ChatGPT desktop Site Tools evaluation, and final demo video exist.
+This document maps the shipped product to the four official judging criteria. It
+records evidence, not self-assigned scores.
 
-## Score summary
+---
 
-| Criterion | Provisional score |
-| --- | ---: |
-| WebMCP leverage | **8.5 / 10** |
-| Execution | **7.5 / 10** |
-| Potential impact | **7.5 / 10** |
-| Creativity & ambition | **8.5 / 10** |
+## WebMCP leverage
 
-No score is a submission claim or judge prediction.
+- Exactly **seven real tools** registered through the current
+  `document.modelContext` API — `get_profile`, `get_capabilities`,
+  `list_projects`, `get_project`, `match_requirements`, `focus_project`,
+  `create_collaboration_brief`.
+- **Real tool invocation** through the host's own registered-tool handles, not
+  direct application calls.
+- **Visible same-page state changes.** Agent actions recompose the interface the
+  human is already looking at; there is no separate chat surface.
+- **Deterministic requirement matching** — normalized requirements resolved
+  through explicit exact, alias and one-hop related edges with fixed weights. No
+  embeddings, fuzzy matching or model-generated scores.
+- **`focus_project`** opens the same Inspect surface a person reaches by
+  clicking, including exact scroll restoration on return.
+- **Page-local collaboration brief** — editable, reversible, never transmitted.
+- **Negative-fit behaviour** — unsupported requirements stay visible as
+  **NOT DEMONSTRATED** instead of being inflated into a match.
+- **Chrome host certification: PASS** on the deployed production origin.
 
-## WebMCP leverage — 8.5 / 10
+Read-only tools are annotated `readOnlyHint: true`; the three state-changing
+tools are truthfully marked non-read-only, and the two that accept free text
+carry `untrustedContentHint: true`.
 
-### Evidence
+## Execution
 
-- BAI exposes seven purpose-specific tools rather than one generic escape hatch.
-- Read operations distinguish profile, capability, project-list, and project-dossier discovery.
-- `match_requirements`, `focus_project`, and `create_collaboration_brief` update the same visible interface a person uses.
-- The agent's work is inspectable: matching visibly recomposes the evidence field, focus opens real evidence, and brief creation produces a human-editable page-local draft.
-- Manual and WebMCP commands share one application facade and deterministic semantic state.
-- Tool annotations truthfully distinguish read-only operations from reversible local UI mutations.
-- There is no filesystem, shell, database, CRM, email, token, arbitrary-fetch, private-repository, or network-write tool.
+- **Public working production URL**, HTTP 200, no authentication required.
+- **Responsive 390 → 1920**, verified at 390, 768, 1366 and 1920: zero
+  horizontal overflow, zero nested vertical scroll, one document scrollbar.
+- **Real project evidence** — seven curated public-safe project records and 18
+  user-approved WebP evidence assets with pinned hashes, dimensions and
+  provenance.
+- **Manual fallback** — the full requirements → match → inspect → brief journey
+  works without any agent. WebMCP enhances the page; it is not a dependency.
+- **Cinematic Inspect and media viewer** — a shared spatial object that expands
+  from its cover and returns to it, verified frame-by-frame to land pixel-exact
+  with no reversals.
+- **Accessibility and reduced motion** — focus is trapped and restored, surfaces
+  are keyboard-reachable, and `prefers-reduced-motion` resolves every surface to
+  its final state with no travelling media.
+- **240 automated tests** across 40 files, plus media and eval validators.
+- **Zero known production console errors**; `npm audit` reports 0
+  vulnerabilities.
 
-### Remaining weakness
+## Potential impact
 
-The central promise is proven by source tests and fake-host execution, not yet by a real Chrome host or ChatGPT Site Tools session. Until the final deployed page exposes exactly seven tools and the natural-language prompt table passes, the strongest challenge-specific claim remains provisional.
+- Portfolios currently communicate almost entirely to humans; their structure is
+  visual and editorial rather than machine-readable.
+- Without structured tools, agents infer capability from unstructured
+  presentation — navigation, prose and screenshots — which is exactly where
+  plausible-sounding but unfounded conclusions come from.
+- Structured evidence can improve evaluation, procurement, collaboration
+  discovery and agent-assisted business workflows, because the agent reads what
+  a body of work actually demonstrates rather than what it appears to claim.
+- Honest negative results are part of that value: a system that can say
+  **NOT DEMONSTRATED** is more useful for procurement than one that always finds
+  a fit.
+- The human remains the decision authority throughout. Nothing is sent, booked,
+  emailed or persisted by the agent.
 
-## Execution — 7.5 / 10
+## Creativity and ambition
 
-### Evidence
+- **Portfolio as evidence interface rather than chatbot.** The agent operates on
+  the page instead of beside it.
+- **Spatial evidence recomposition** — ranking is expressed as visible spatial
+  reordering of a shared field, so a person can watch an agent's reasoning take
+  effect.
+- **Shared human/agent visible workspace** — both participants act through one
+  application facade, so manual and agent paths cannot diverge in behaviour.
+- **Deterministic negative fit** as a designed feature rather than an error path.
+- **Real portfolio evidence** from shipped studio products, with reviewed
+  provenance, instead of synthetic demo records.
 
-- The architecture is small and coherent: pure domain logic, one application facade, Zustand semantic state, an isolated WebMCP adapter, and React presentation.
-- Deterministic matching keeps exact, alias, related, and missing evidence visibly separate.
-- Negative fits remain visible instead of being converted into optimistic recommendations.
-- Seven scored projects remain isolated from four explicitly non-scoring Showcase Proof systems.
-- The experience includes semantic ranks, bounded connection traces, evidence-backed Inspect, public/private provenance, editable Brief, honest fallback, keyboard paths, responsive intent, and reduced-motion support.
-- Physical normal-browser QA passed the full manual journey at 390, 430, 768, 1024, and 1366 CSS pixels with no horizontal overflow, clipped buttons, or console errors. All 15 unique evidence assets loaded across the inspected projects and Showcase.
-- Keyboard QA confirmed Enter-to-open, Escape-to-return, and a visible 2px focus outline. The manual Swift + Metal + native iOS case returned 0% coverage with all three requirements marked **NOT DEMONSTRATED** and no fabricated direct evidence.
-- The final staged BAI-ULTRA-03 worktree passed a clean install, typecheck, 31 test files / 162 tests, lint, build, media and eval validators, diff-check, and an npm audit with 0 vulnerabilities.
-
-### Remaining weakness
-
-There is no certified public deployment, final release SHA, deployed console/network record, or real-host execution matrix yet. The five target widths, complete keyboard-only journey, accessibility-tree semantics, reduced motion, and color-independent state comprehension now have physical normal-browser evidence, but deployed performance and network measurements remain pending.
-
-## Potential impact — 7.5 / 10
-
-### Evidence
-
-- The product addresses a real agent-era problem: portfolios are visually rich but structurally ambiguous to agents.
-- The pattern could extend beyond portfolios to vendor evaluation, procurement evidence, grant review, expert directories, and other proof-based discovery workflows.
-- Evidence coverage, verification, limitations, and negative fit can reduce unsupported capability claims.
-- The interface keeps human review central instead of hiding agent activity in a separate automation layer.
-- The manual fallback makes the same evidence useful even without a compatible agent host.
-
-### Remaining weakness
-
-The current application is a curated, single-studio corpus with no longitudinal use data, external evaluator study, or proof that agents select the right tool across accounts and models. Broader impact is plausible but not yet measured. The release should present this as a reusable interaction pattern, not as validated market adoption.
-
-## Creativity & ambition — 8.5 / 10
-
-### Evidence
-
-- BAI treats the portfolio itself as an agent-operable evidence surface instead of attaching a chatbot to a conventional site.
-- The persistent authored field translates deterministic rank state into visible spatial recomposition.
-- Inspect retains the field as context while exposing real imagery, Why Selected reasoning, evidence provenance, limitations, and public/private boundaries.
-- The editable Brief makes the agent-to-human handoff concrete without introducing a backend, submission action, or hidden persistence.
-- Supporting visual systems are deliberately shown without contaminating the scored evidence graph.
-- The design combines a restrained editorial interface with explicit machine-readable contracts and trust boundaries.
-
-### Remaining weakness
-
-The ambition currently lives within a front-end demonstration and a bounded static dataset. The submission still needs a concise video that makes the agent-driven state changes unmistakable; otherwise judges may perceive a polished portfolio matcher before they perceive the WebMCP interaction model.
+---
 
 ## Twenty-second judge test
 
-### What is it?
+**What is it?** A real creative-technology portfolio that exposes its evidence
+as seven WebMCP tools, so people and agents can evaluate fit on the same page.
 
-A public evidence workspace that evaluates what a portfolio can actually prove against stated requirements.
+**What does WebMCP add?** Structured operations — discovery, deterministic
+matching, focus and brief creation — instead of an agent guessing at navigation
+and screenshots.
 
-### What does WebMCP add?
+**What changes visibly?** The evidence field recomposes around the strongest
+real evidence, Inspect opens on the agent's selection, and a page-local brief
+appears — all in the interface the human is watching.
 
-Typed tools let an agent discover evidence, run deterministic matching, focus the relevant proof, and create a reversible collaboration brief without guessing from page layout.
+**Where does human control remain?** Everywhere. Every agent action is labelled
+**WEBMCP ACTION**, every surface is reversible, the manual journey is complete on
+its own, and nothing is ever sent.
 
-### What changes visibly?
+## Honest limitations
 
-The same evidence field a person sees recomposes after `match_requirements`; `focus_project` opens the selected proof; `create_collaboration_brief` reveals an editable page-local document.
-
-### Where does human control remain?
-
-Every core action has a manual path. The human sees provenance, inspects reasons and limitations, edits the brief, returns, clears, or resets. No tool can send, persist, access private systems, or perform an external write.
-
-## Release-critical findings
-
-1. Real localhost Chrome WebMCP execution is currently `BLOCKED_BY_HOST_ACCESS`; the observed normal browser exposed no `document.modelContext`.
-2. The deployed-host tool inventory and direct match/focus/brief/negative-fit effects are not yet certified.
-3. ChatGPT desktop Site Tools discovery and prompts A–H are not yet run.
-4. Public repository, live deployment, video, Devpost entry, final release SHA/tag, and submission freeze remain external release gates.
-
-## Important remaining work
-
-- Preserve the verified local gate and deploy only the exact committed release build.
-- Repeat the verified accessibility journey on the deployed build and record deployed performance/network observations.
-- Capture exact Chrome version, flag, origin, tool inventory, inputs, results, visible effects, and console/network observations.
-- Repeat direct certification on the deployed origin before recording ChatGPT Site Tools results.
-- Make the demo video show the seven tools and visible state changes early enough that WebMCP leverage is unmistakable.
-
-## Provisional recommendation
-
-The concept and local execution are strong enough to continue toward submission, but the release is **not yet safe to describe as fully WebMCP-certified or submission-ready**. Keep the current scores provisional until the host, deployment, Site Tools, video, and final freeze gates are complete.
+- ChatGPT Site Tools was **not separately certified**; the certified host is
+  Chrome, which the Challenge rules accept. No Site Tools pass is claimed.
+- The evidence corpus is curated rather than open-ended: the matcher is only as
+  good as the recorded evidence, which is the deliberate trade for determinism.
+- Two projects have no public live URL, so they carry no live-site call to
+  action rather than an invented one.

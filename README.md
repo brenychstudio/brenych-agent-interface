@@ -84,7 +84,7 @@ Agent actions are visibly labeled. Inspect and Brief remain reversible, keyboard
 
 ## Public/private boundary
 
-The field contains seven curated public-safe project records and 15 reviewed WebP evidence derivatives. Screenshot pixels are approved visual evidence, while technical claims come only from verified evidence records. Visible UI text in a screenshot is not treated as technical authority.
+The field contains seven curated public-safe project records and 18 reviewed WebP evidence derivatives. Screenshot pixels are approved visual evidence, while technical claims come only from verified evidence records. Visible UI text in a screenshot is not treated as technical authority.
 
 Private code, absolute workstation paths, credentials, prompts, customer records, internal RPC names, and execution details are excluded from the dataset and tool results. See [`docs/PUBLIC-EVIDENCE-BOUNDARY.md`](docs/PUBLIC-EVIDENCE-BOUNDARY.md), [`docs/EVIDENCE-MEDIA-MANIFEST.md`](docs/EVIDENCE-MEDIA-MANIFEST.md), and [`ASSET-NOTICE.md`](ASSET-NOTICE.md).
 
@@ -152,8 +152,8 @@ BAI itself was created during the 2026 challenge period. The represented source 
 
 - No runtime secret, credential, or environment variable is required.
 - No network write, backend, database, authentication, analytics, remote MCP server, or LLM SDK exists.
-- Security tests scan tracked and untracked release text for workstation paths, credential assignments, provider-token shapes, private-key headers, email addresses, and private/link-local URLs. For the private release gate, set `BAI_PRIVATE_USERNAME` in the shell before running `npm test`; that runtime-only value is scanned case-insensitively and is never committed. Binary publication is restricted to the 15 registered WebPs and five hash- and dimension-pinned release captures.
-- Media tests require exactly 15 registered WebP derivatives; files, hashes, dimensions, captions, ownership, roles, and public-safe semantics must match the manifest, and reserve source stems are rejected.
+- Security tests scan tracked and untracked release text for workstation paths, credential assignments, provider-token shapes, private-key headers, email addresses, and private/link-local URLs. For the private release gate, set `BAI_PRIVATE_USERNAME` in the shell before running `npm test`; that runtime-only value is scanned case-insensitively and is never committed. Binary publication is restricted to the 18 registered WebPs and five hash- and dimension-pinned release captures.
+- Media tests require exactly 18 registered WebP derivatives; files, hashes, dimensions, captions, ownership, roles, and public-safe semantics must match the manifest, and reserve source stems are rejected.
 - WebMCP lifecycle tests cover cancellation, duplicate registration, teardown, and unsupported-browser fallback.
 
 ## License
@@ -163,6 +163,7 @@ Software source is licensed under the [Apache License 2.0](LICENSE). Evidence sc
 ## Release and submission
 
 - Public repository: `https://github.com/brenychstudio/brenych-agent-interface`
-- Live deployment, release commit, tag, and certification state: [`docs/submission/SUBMISSION-FREEZE.md`](docs/submission/SUBMISSION-FREEZE.md)
+- Live deployment, release commit, and certification state: [`docs/submission/SUBMISSION-FREEZE.md`](docs/submission/SUBMISSION-FREEZE.md)
+- One-page submission packet: [`docs/submission/FINAL-SUBMISSION-PACKET.md`](docs/submission/FINAL-SUBMISSION-PACKET.md)
 - Judge testing: [`docs/submission/TESTING-INSTRUCTIONS.md`](docs/submission/TESTING-INSTRUCTIONS.md)
 - WebMCP certification: [`docs/submission/WEBMCP-CERTIFICATION.md`](docs/submission/WEBMCP-CERTIFICATION.md)

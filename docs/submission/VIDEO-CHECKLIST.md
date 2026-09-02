@@ -1,49 +1,64 @@
 # Demo Video Checklist
 
-## Current status
+Operational recording checklist. The product is certified and frozen; everything
+below is recording and upload work.
 
-- [ ] Public live site verified — **PENDING**
-- [ ] Real ChatGPT Site Tools capture completed, if available — **PENDING**
-- [ ] Final recording completed — **PENDING**
-- [ ] Public YouTube URL verified — **PENDING**
+Record from `https://brenych-agent-interface.pages.dev/` using the script in
+[`DEMO-SCRIPT.md`](DEMO-SCRIPT.md).
 
-Do not fake or composite a Site Tools interaction. If the host is unavailable, keep the item pending and record the blocker separately.
+## Capture setup
 
-## Before recording
+- [ ] 1920×1080 preferred
+- [ ] Clean browser profile
+- [ ] Notifications off
+- [ ] Browser zoom at 100%
+- [ ] Cursor controlled and calm
+- [ ] No unrelated tabs
+- [ ] Production URL only — no localhost, no preview URL
+- [ ] No credentials, tokens, account menus, customer records or local paths can appear
+- [ ] Clear microphone in a quiet environment
 
-- [ ] Use the public live site, not a local development URL.
-- [ ] Confirm the real host discovers exactly 7 WebMCP tools.
-- [ ] Confirm the golden match, BDB inspect, collaboration brief, and negative-fit flow work on the live deployment.
-- [ ] Capture at **1080p minimum**.
-- [ ] Set browser zoom so controls and evidence remain readable.
-- [ ] Keep the cursor visible and calm.
-- [ ] Disable notifications and close messaging overlays.
-- [ ] Close private tabs, unrelated tabs, password managers, and developer tooling.
-- [ ] Confirm no credentials, tokens, account menus, customer records, or local filesystem paths can appear.
-- [ ] Use a clear microphone in a quiet environment.
-- [ ] Prepare English narration.
-- [ ] Use English voiceover and interface audio only; do not add music.
+## Before rolling
+
+- [ ] **WEBMCP CONNECTED · AGENT TOOLS ONLINE** is visible on the page
+- [ ] The host discovers exactly 7 tools
+- [ ] Golden match, BDB Inspect, collaboration brief and negative fit all work on the live deployment
 
 ## Required story beats
 
-- [ ] State the thesis: **A portfolio that can prove fit, not only present work.**
-- [ ] Show the real Site Tools surface if available and the 7 bounded tools.
-- [ ] Run the Electron + MCP + AI automation + Supabase match.
-- [ ] Show visible field recomposition and evidence coverage.
-- [ ] Open BDB and show its real evidence, provenance, and public/private boundary.
-- [ ] Create the page-local collaboration brief and make a human edit.
-- [ ] Run Swift + Metal + native iOS and show **NOT DEMONSTRATED**.
-- [ ] State that the matcher is deterministic and that there is no LLM, backend, database, or private-source access.
+- [ ] Thesis stated: **A portfolio that can prove fit, not only present work.**
+- [ ] The seven tools are shown
+- [ ] Electron + MCP + AI automation + Supabase match runs
+- [ ] Visible field recomposition and evidence coverage
+- [ ] BDB opened, showing real evidence and the public/private boundary
+- [ ] Page-local collaboration brief created, with a human edit
+- [ ] Swift + Metal + native iOS returns **NOT DEMONSTRATED**
+- [ ] Deterministic model stated — no LLM, backend, database or private-source access
 
-## Final quality control
+## Audio
 
-- [ ] Runtime is **2:20-2:45** and never exceeds **2:55**.
-- [ ] The exported video is under 3 minutes.
-- [ ] Audio is present, intelligible, and synchronized.
-- [ ] The final cut contains no notifications, private tabs, credentials, customer data, local paths, or unapproved assets.
-- [ ] Claims match the final public application and certified host behavior.
-- [ ] The video is uploaded to YouTube with **Public** visibility.
-- [ ] The YouTube URL works in a signed-out browser session.
-- [ ] The public title and description are in English.
+- [ ] Audio present
+- [ ] Voice intelligible and synchronized
+- [ ] No copyrighted third-party music
+- [ ] Voice only preferred; any music must be owned by the entrant
 
-Human upload is acceptable. Do not mark the video or URL complete until the public playback check passes.
+Record the screen first if preferred. Voiceover may be recorded separately and
+synced — one-take narration is not required.
+
+## Export and upload
+
+- [ ] Video is under 3 minutes; target 75–90 seconds
+- [ ] Filename: `brenych-agent-interface-webmcp-challenge.mp4`
+- [ ] Uploaded to YouTube with **Public** visibility
+- [ ] Playback verified while signed out or in an incognito window
+- [ ] Audio verified on playback
+- [ ] Title and description in English
+- [ ] Claims match the certified application behaviour
+
+## Final gate
+
+- [ ] The cut contains no notifications, private tabs, credentials, customer data, local paths or unapproved assets
+- [ ] No Site Tools certification is claimed unless that run actually happened
+- [ ] Public YouTube URL recorded in [`SUBMISSION-FREEZE.md`](SUBMISSION-FREEZE.md)
+
+Do not mark the video or URL complete until the public playback check passes.

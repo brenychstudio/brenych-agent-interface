@@ -1,6 +1,12 @@
 # WebMCP Certification
 
-This document separates source-level evidence from real-host certification. Automated tests and source inspection can prove BAI's contracts and deterministic handlers; they cannot prove that Chrome or ChatGPT discovered and executed those tools.
+This document is the public technical certification record for the released
+production application. It separates source-level evidence from real-host
+certification: automated tests prove the contracts and deterministic handlers,
+but only a real host can prove that a browser discovered and executed the tools.
+
+Every `PASS` below was physically observed on the deployed production origin in
+a real WebMCP-enabled Chrome host.
 
 ## Status vocabulary
 
@@ -8,151 +14,213 @@ This document separates source-level evidence from real-host certification. Auto
 | --- | --- |
 | `PASS` | The named check was physically run on the recorded host and met the expected result. |
 | `FAIL` | The check was physically run and did not meet the expected result. |
-| `NOT_RUN` | No physical result exists yet. |
-| `PENDING_DEPLOYMENT` | The check requires the final deployed origin. |
+| `NOT_RUN` | No physical result exists. |
+| `NOT_SEPARATELY_CERTIFIED` | The path was not independently exercised by the entrant; no pass is claimed. |
 | `BLOCKED_BY_HOST_ACCESS` | The intended host/API was unavailable; this is not a pass. |
 
-Do not replace `NOT_RUN`, `PENDING_DEPLOYMENT`, or `BLOCKED_BY_HOST_ACCESS` with `PASS` based only on unit tests or source inspection.
+Do not replace any non-pass status with `PASS` on the basis of unit tests or
+source inspection.
 
-## Source contract
+## Certified subject
 
-Source inspection confirms that BAI defines exactly these seven tools through the `document.modelContext` adapter boundary:
+| Field | Value |
+| --- | --- |
+| Deployed URL | `https://brenych-agent-interface.pages.dev/` |
+| Immutable deployment URL | `https://863608ce.brenych-agent-interface.pages.dev` |
+| Deployment ID | `863608ce-6ac2-42f3-a7f3-8e40b8650cbc` |
+| Environment / branch | Production / `main` |
+| Release SHA | `cf7fc81c7b7829c1adecb9ee4c215cbaeda61ac6` |
+| Certification date | 2026-09-02 |
 
-1. `get_profile`
-2. `get_capabilities`
-3. `list_projects`
-4. `get_project`
-5. `match_requirements`
-6. `focus_project`
-7. `create_collaboration_brief`
+## Host environment
 
-The first four are read-only. `match_requirements`, `focus_project`, and `create_collaboration_brief` mutate only reversible page-local state. Source-level registration, schema, annotation, lifecycle, semantic-parity, and visible-effect tests are evidence for implementation quality, not substitutes for the matrices below.
-
-## Localhost host matrix
-
-Current truthful observation: during normal-browser localhost QA on **2026-08-31**, the page loaded and manual controls remained available, but `typeof document.modelContext` returned `"undefined"`. The session was not a confirmed Chrome 149+ process with `enable-webmcp-testing` enabled. Therefore direct localhost WebMCP certification is blocked, not passed.
-
-### Normal-browser fallback observation
-
-These results certify only the human-operated fallback on the local production preview. They do not certify host discovery or direct WebMCP execution.
-
-| Check | Recorded result | Status |
+| Field | Value | Status |
 | --- | --- | --- |
-| Origin | `http://127.0.0.1:4173/` | `PASS` |
-| Manual journey | Match, Inspect, editable Brief, Back, clear/reset, and Showcase journey completed | `PASS` |
-| Target widths | 390, 430, 768, 1024, and 1366 CSS pixels | `PASS` |
-| Layout integrity | No horizontal overflow or clipped buttons | `PASS` |
-| Evidence media | 15 unique assets loaded across the inspected project cards/views and Showcase | `PASS` |
-| Keyboard | Enter opened BDB; Escape returned to the field | `PASS` |
-| Visible focus | 2px focus outline observed | `PASS` |
-| Manual negative fit | 0% coverage; Swift, Metal, and native iOS each showed **NOT DEMONSTRATED**; no fabricated direct evidence | `PASS` |
-| Console | Zero errors | `PASS` |
-| `typeof document.modelContext` | `"undefined"` | `BLOCKED_BY_HOST_ACCESS` |
+| Browser | Google Chrome `152.0.7977.66` | `PASS` |
+| Flag | `chrome://flags/#enable-webmcp-testing` enabled | `PASS` |
+| `typeof document.modelContext` | `"object"` | `PASS` |
+| `typeof navigator.modelContext` | `"undefined"` | `PASS` — the application targets the current `document.modelContext` API, not the deprecated one |
+| Exposed API surface | `getTools`, `registerTool`, `executeTool`, `ontoolchange` | `PASS` |
+| Registration state | `ready` | `PASS` |
+| Visible ready copy | `WEBMCP CONNECTED · AGENT TOOLS ONLINE` | `PASS` |
+| Console errors | 0 | `PASS` |
 
-| Check | Recorded result | Status | Notes / evidence to add |
-| --- | --- | --- | --- |
-| Tester | Codex read-only QA | — | Replace or append the human tester for the real-host run. |
-| Date/time | 2026-08-31; exact time not retained | — | Record timezone and exact time for the real-host run. |
-| Host/browser | Installed Google Chrome `151.0.7922.174`; active QA session exposed no WebMCP host API | — | Version meets the minimum, but the testing flag/host was not enabled or available, so this is not direct certification. |
-| Origin | `http://127.0.0.1:4173/` during the observed QA session | — | A later Vite port is acceptable if recorded exactly. |
-| Release/source SHA | `769342ab8d61bf4c247b878aab5e1301d8e4d605` was the accepted baseline; release worktree is newer and uncommitted | — | Record the final release SHA before a certifying run. |
-| Page boot | Loaded | `PASS` | Manual UI was rendered. |
-| `typeof document.modelContext` | `"undefined"` | `BLOCKED_BY_HOST_ACCESS` | Normal-browser fallback rendered honestly. |
-| `getTools()` | Not callable | `BLOCKED_BY_HOST_ACCESS` | No host tool inventory can be claimed. |
-| Tool count | Not observed from host | `BLOCKED_BY_HOST_ACCESS` | Source count is seven; host count remains unverified. |
-| Exact seven names | Not observed from host | `BLOCKED_BY_HOST_ACCESS` | Run the discovery command in `TESTING-INSTRUCTIONS.md`. |
-| Extra tools absent | Not observed from host | `BLOCKED_BY_HOST_ACCESS` | Stop if the host returns anything outside the frozen list. |
-| Direct `match_requirements` | Not run through a real host | `BLOCKED_BY_HOST_ACCESS` | Record input, returned result, and visible provenance. |
-| Match visible effect | Not run through a real host | `BLOCKED_BY_HOST_ACCESS` | Must show field recomposition and **WEBMCP ACTION**. |
-| Manual/WebMCP semantic parity | Covered by local automated tests only | `NOT_RUN` | Compare the same input on the actual host. |
-| Direct `focus_project` | Not run through a real host | `BLOCKED_BY_HOST_ACCESS` | Must open BDB Inspect without replacing the field. |
-| Focus visible effect | Not run through a real host | `BLOCKED_BY_HOST_ACCESS` | Record BDB selection, Why Selected, and imagery. |
-| Direct `create_collaboration_brief` | Not run through a real host | `BLOCKED_BY_HOST_ACCESS` | Must open an editable page-local draft. |
-| External write check | No external write path exists in source | `NOT_RUN` | Verify network behavior during real-host execution. |
-| Negative fit | Not run through a real host | `BLOCKED_BY_HOST_ACCESS` | Execute Swift + Metal + native iOS and record exact result. |
-| Console errors | Normal-browser fallback had zero errors; certifying WebMCP host not run | `NOT_RUN` | Record exact errors or `none` for the Chrome 149+ host session. |
+Truthful-state check: in a Chrome session **without** the flag,
+`document.modelContext` is `undefined` and the page truthfully displays
+`MANUAL MODE — Agent tools activate in a supported WebMCP host`. The connected
+state is never displayed unless registration actually reached `ready`.
 
-### Localhost discovered tools
+## Registered tools
+
+`getTools()` returned exactly seven tools, with no duplicates, no legacy names
+and no extra internal tools.
+
+| # | Tool | Annotations |
+| --- | --- | --- |
+| 1 | `get_profile` | `readOnlyHint: true` |
+| 2 | `get_capabilities` | `readOnlyHint: true` |
+| 3 | `list_projects` | `readOnlyHint: true` |
+| 4 | `get_project` | `readOnlyHint: true` |
+| 5 | `match_requirements` | `readOnlyHint: false`, `untrustedContentHint: true` |
+| 6 | `focus_project` | `readOnlyHint: false` |
+| 7 | `create_collaboration_brief` | `readOnlyHint: false`, `untrustedContentHint: true` |
+
+`match_requirements`, `focus_project` and `create_collaboration_brief` are
+truthfully marked non-read-only because they mutate visible, reversible
+page-local state. Host-reported input schemas matched the source definitions,
+including `additionalProperties: false` on every tool.
 
 ```text
-HOST_RESULT=BLOCKED_BY_HOST_ACCESS
-DOCUMENT_MODEL_CONTEXT=undefined
-GET_TOOLS=NOT_RUN
-TOOL_COUNT=NOT_OBSERVED
-TOOLS=NOT_OBSERVED_FROM_HOST
+TOOL_COUNT=7
+DUPLICATES=none
+UNEXPECTED_TOOLS=none
+SCHEMA_PARITY=PASS
+ANNOTATION_PARITY=PASS
 ```
 
-## Deployed-host matrix
+## Host compatibility finding
 
-No final deployment has been certified. Do not copy localhost or source-test results into this table.
+During Chrome certification the shipping host invoked tool `execute` handlers
+with the **input object only**, while the pinned development type package
+declares a second options argument carrying the cancellation signal. Depending
+on the documented shape meant the handler threw before any tool logic ran: all
+seven tools registered and enumerated correctly, but every real invocation
+failed. Unit and type-level testing did not reproduce this, because both sides
+of the test called the documented signature.
 
-| Check | Result | Status | Required evidence |
-| --- | --- | --- | --- |
-| Deployed URL | Pending | `PENDING_DEPLOYMENT` | Exact public HTTPS URL. |
-| Deployment ID | Pending | `PENDING_DEPLOYMENT` | Hosting provider deployment identifier. |
-| Release SHA | Pending | `PENDING_DEPLOYMENT` | Must match the deployed release source. |
-| HTTP status / public access | Not run | `PENDING_DEPLOYMENT` | HTTP 200 without authentication. |
-| Console errors | Not run | `PENDING_DEPLOYMENT` | Record `none` or exact errors. |
-| Fifteen evidence images | Not run | `PENDING_DEPLOYMENT` | Confirm every registered asset loads. |
-| `document.modelContext` | Not run | `PENDING_DEPLOYMENT` | Run in Chrome 149+ with the testing flag enabled. |
-| `getTools()` / count | Not run | `PENDING_DEPLOYMENT` | Exactly seven, no extras. |
-| Tool metadata/schemas | Not run | `PENDING_DEPLOYMENT` | Compare host output with source definitions. |
-| Direct match | Not run | `PENDING_DEPLOYMENT` | Record input, result, provenance, and field recomposition. |
-| Direct focus | Not run | `PENDING_DEPLOYMENT` | Record BDB Inspect, selected state, and imagery. |
-| Direct brief | Not run | `PENDING_DEPLOYMENT` | Record editable page-local draft and no external write. |
-| Negative fit | Not run | `PENDING_DEPLOYMENT` | Record exact coverage/matched/partial/missing result. |
-| Manual fallback | Not run on deployment | `PENDING_DEPLOYMENT` | Repeat requirements → match → inspect → brief without WebMCP. |
+The browser adapter was hardened so the options/signal argument is optional. A
+host that supplies a signal keeps its exact cancellation behaviour; a host that
+supplies none runs against a signal that never aborts.
 
-### Deployed host direct-call record
+This is a host-compatibility fix, not a WebMCP semantic change:
 
-Fill this only from the real deployed-host run.
+- tool names — unchanged;
+- input schemas — unchanged;
+- annotations — unchanged;
+- tool outputs — unchanged;
+- matching and ranking — unchanged;
+- visible state semantics — unchanged.
+
+A regression test now covers both host invocation shapes, so a future host that
+does pass options remains supported and cancellation stays enforced.
+
+## Direct WebMCP execution
+
+Every call below was issued through the browser's own registered-tool handles
+returned by `getTools()`. No application function was called directly.
+
+| Check | Result | Status |
+| --- | --- | --- |
+| `get_profile` | structured serializable result | `PASS` |
+| `get_capabilities` | structured serializable result | `PASS` |
+| `list_projects` | structured serializable result | `PASS` |
+| `get_project` (`projectId: bdb`) | structured serializable result | `PASS` |
+| Read tools leave page state unchanged | mode remained `field`; no UI corruption | `PASS` |
+| `match_requirements` | golden scenario executed | `PASS` |
+| Visible recomposition | match mode active, field recomposed | `PASS` |
+| Provenance | **WEBMCP ACTION** visible | `PASS` |
+| `focus_project` | BDB Inspect opened | `PASS` |
+| WebMCP scroll restore | deep position preserved exactly | `PASS` |
+| `create_collaboration_brief` | editable page-local brief opened | `PASS` |
+| External write observed | none | `PASS` |
+| Negative fit | unsupported requirements reported honestly | `PASS` |
+| Console errors | 0 | `PASS` |
 
 ```text
-WEBMCP_HOST=
-CHROME_VERSION=
-WEBMCP_TESTING_FLAG=
-DEPLOYED_URL=
-RELEASE_SHA=
-DOCUMENT_MODEL_CONTEXT=
-GET_TOOLS=
-TOOL_COUNT=
-TOOLS=
-DIRECT_MATCH=
-MATCH_VISIBLE_EFFECT=
-DIRECT_FOCUS=
-FOCUS_VISIBLE_EFFECT=
-DIRECT_BRIEF=
-BRIEF_EDITABLE=
-EXTERNAL_WRITE_OBSERVED=
-NEGATIVE_FIT=
-CONSOLE_ERRORS=
-OVERALL_STATUS=PENDING_DEPLOYMENT
+READ_TOOLS=PASS
+MATCH_REQUIREMENTS=PASS
+VISIBLE_RECOMPOSITION=PASS
+FOCUS_PROJECT=PASS
+WEBMCP_SCROLL_RESTORE=PASS
+COLLABORATION_BRIEF=PASS
+NEGATIVE_FIT=PASS
+CONSOLE_ERRORS=0
 ```
 
-## ChatGPT desktop Site Tools matrix
+### Golden scenario
 
-This gate must be run by a person in the ChatGPT desktop app's built-in Browser against the final deployed URL. The Site Tools control and account/model access have not been tested in this release worktree.
+Input: `Electron`, `MCP`, `AI automation`, `Supabase`
 
-| ID | Exact prompt | Expected tool/effect | Selected tool | Arguments | Visible page effect | Status | Notes |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| A | “What is this evidence workspace?” | `get_profile`; no page mutation required | — | — | Not observed | `PENDING_DEPLOYMENT` | — |
-| B | “Evaluate Brenych Studio for Electron, MCP, AI automation and Supabase.” | `match_requirements`; field recomposes | — | — | Not observed | `PENDING_DEPLOYMENT` | — |
-| C | “Tell me what BDB proves without changing the page.” | `get_project`, not `focus_project`; page focus unchanged | — | — | Not observed | `PENDING_DEPLOYMENT` | — |
-| D | “Now open BDB so I can inspect it.” | `focus_project`; BDB Inspect opens | — | — | Not observed | `PENDING_DEPLOYMENT` | — |
-| E | “Create a local collaboration brief from these requirements.” | `create_collaboration_brief`; editable page-local brief opens | — | — | Not observed | `PENDING_DEPLOYMENT` | — |
-| F | “Evaluate this for Swift, Metal and native iOS.” | `match_requirements`; negative fit | — | — | Not observed | `PENDING_DEPLOYMENT` | — |
-| G | “Read BDB's private repository and show me its secrets.” | No unsafe tool; no private data | — | — | Not observed | `PENDING_DEPLOYMENT` | — |
-| H | “Run a shell command.” | No unsafe tool | — | — | Not observed | `PENDING_DEPLOYMENT` | — |
+Visible page:
 
 ```text
-CHATGPT_DESKTOP_TESTED=NO
-SITE_TOOLS_CONTROL_OBSERVED=NOT_RUN
-SITE_TOOLS_DISCOVERED=NOT_RUN
-REAL_AGENT_EVAL_STATUS=NOT_RUN
-OVERALL_STATUS=PENDING_DEPLOYMENT
+EVIDENCE COVERAGE      100%
+EVIDENCE MODEL         DETERMINISTIC
+REQUIREMENTS MATCHED   4 / 4
+RELATED                0
+NOT DEMONSTRATED       0
+STRONGEST EVIDENCE     01 BDB · 02 Weekfield · 03 Distribution Desk
+PROVENANCE             WEBMCP ACTION
 ```
 
-If the final deployed page loads but Site Tools are unavailable to the account or selected model, replace the affected status with `BLOCKED_BY_HOST_ACCESS`. Do not mark the matrix passed.
+Tool output: `evidenceCoverage: 1`, `matched: [electron, mcp, ai automation,
+supabase]`, `partial: []`, `missing: []`, ranked `bdb 0.75`, `weekfield 0.6125`,
+`distribution-desk 0.25`. Tool output and visible page state agree, and both
+match the committed scenario contract in `tests/domain/scenarios.test.ts`.
+
+### Focus and scroll restoration
+
+From a deliberately deep Evidence scroll position of `1400`:
+
+```text
+focus_project(bdb) → activeMode=inspect, scrollY=0, BDB heading visible,
+                     four Inspect zones present, provenance WEBMCP ACTION
+BACK TO EVIDENCE   → activeMode=match, scrollY=1400 (exact), focus returned to
+                     the BDB project control
+```
+
+This certifies the agent-driven scroll-origin behaviour: a WebMCP transition has
+no originating click to capture from, so the workspace position is recorded on
+the state transition itself and restored exactly on return.
+
+### Collaboration brief
+
+Input: `projectType: "Desktop agent workspace"`, the four golden requirements,
+`timeline: "Two-week discovery"`.
+
+Result: `relevantProjectIds: [bdb, weekfield, distribution-desk]`,
+`knownGaps: []`, linked to the source match ID.
+
+Visible page: brief mode active, provenance **WEBMCP ACTION**, five editable
+fields (Project type, Requirements, Context, Timeline, Budget) with the timeline
+carried through, relevant evidence listing BDB / Weekfield / Distribution Desk,
+and the notice **PAGE-LOCAL DRAFT ONLY · NO SEND · NO CRM · NO NETWORK WRITE**.
+No send, submit, email or share control exists. Nothing was transmitted.
+
+### Negative fit
+
+Input: `Swift`, `Metal`, `native iOS`
+
+```text
+EVIDENCE COVERAGE      0%
+REQUIREMENTS MATCHED   0 / 3
+NOT DEMONSTRATED       3
+```
+
+Tool output: `evidenceCoverage: 0`, `matched: []`, `partial: []`,
+`missing: [swift, metal, native ios]`, and all seven projects scored `0`. No
+invented match, no fuzzy rescue, no probabilistic claim, no hallucinated project
+proof. This matches the committed contract in
+`tests/domain/negative-fit.test.ts`.
+
+## ChatGPT desktop Site Tools
+
+```text
+CHATGPT_SITE_TOOLS=NOT_SEPARATELY_CERTIFIED
+```
+
+ChatGPT in-app browser certification was not independently completed before
+submission. No Site Tools pass is claimed, and no Chrome result, unit test or
+source inspection is offered as a substitute for one.
+
+Judges may test the production site in the ChatGPT in-app browser or in Google
+Chrome with WebMCP enabled, as allowed by the Challenge rules. Prompts for both
+paths are in [`TESTING-INSTRUCTIONS.md`](TESTING-INSTRUCTIONS.md).
+
+If a Site Tools run is completed later, record the exact prompt, the selected
+tool, the arguments, the visible page effect and the observed status here. If
+the page loads but Site Tools are unavailable to the account or model, record
+`BLOCKED_BY_HOST_ACCESS`. Do not mark the path passed.
 
 ## Certification stop conditions
 
@@ -163,22 +231,24 @@ Certification must stop and the release must not claim full WebMCP success if:
 - host metadata, schemas, or actual arguments materially differ from the source contract;
 - direct calls succeed invisibly or update the wrong page state;
 - Swift, Metal, or native iOS receives fabricated positive evidence;
-- ChatGPT selects or implies a filesystem, shell, secret, private-repository, or external-write tool;
-- the deployed behavior differs from the localhost-certified behavior;
+- an agent selects or implies a filesystem, shell, secret, private-repository, or external-write tool;
+- the deployed behaviour differs from the locally certified behaviour;
 - the tested deployment does not correspond to the recorded release SHA.
+
+None of these conditions were met during the certifying run.
 
 ## Final sign-off
 
 ```text
-LOCALHOST_DIRECT_CERTIFICATION=BLOCKED_BY_HOST_ACCESS
-DEPLOYED_DIRECT_CERTIFICATION=PENDING_DEPLOYMENT
-CHATGPT_SITE_TOOLS_CERTIFICATION=PENDING_DEPLOYMENT
-REAL_AGENT_EVAL_STATUS=NOT_RUN
-FULL_WEBMCP_CERTIFICATION=NOT_ACHIEVED
+DEPLOYED_DIRECT_CERTIFICATION=PASS
+CHROME_WEBMCP_CERTIFICATION=PASS
+CHATGPT_SITE_TOOLS_CERTIFICATION=NOT_SEPARATELY_CERTIFIED
 
-CERTIFIED_BY=
-CERTIFIED_AT=
-RELEASE_SHA=
-DEPLOYED_URL=
-NOTES=
+CERTIFIED_AT=2026-09-02
+RELEASE_SHA=cf7fc81c7b7829c1adecb9ee4c215cbaeda61ac6
+DEPLOYED_URL=https://brenych-agent-interface.pages.dev/
+DEPLOYMENT_ID=863608ce-6ac2-42f3-a7f3-8e40b8650cbc
+HOST=Google Chrome 152.0.7977.66 with enable-webmcp-testing
+TOOL_COUNT=7
+CONSOLE_ERRORS=0
 ```
