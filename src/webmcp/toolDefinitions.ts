@@ -137,8 +137,17 @@ const compactProjectDossier = (project: ProjectDossier): JsonRecord => ({
   limitations: project.limitations,
 });
 
+/**
+ * Hosts disagree about the execute signature. The published type definitions declare a second
+ * options argument carrying the cancellation signal, but the shipping browser implementation
+ * invokes a registered tool with the input object alone. Destructuring the documented shape throws
+ * before any handler runs, which leaves every tool enumerable yet impossible to execute, so the
+ * options argument is treated as optional. A host that does pass a signal keeps the exact
+ * cancellation behaviour it had; a host that passes none runs against a signal that never aborts.
+ */
 const execute = (handler: (input: unknown, signal: AbortSignal) => object): WebMCP.ToolExecuteCallback =>
-  async (input, { signal }): Promise<ToolResult> => {
+  async (input, options?: WebMCP.ToolExecuteCallbackOptions): Promise<ToolResult> => {
+    const signal = options?.signal ?? new AbortController().signal;
     if (signal.aborted) return cancelledResult();
     try {
       return toolSuccess(handler(input, signal) as Record<string, unknown>);
