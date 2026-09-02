@@ -97,4 +97,4 @@ page must read: WEBMCP CONNECTED · AGENT TOOLS ONLINE
 | [`CHALLENGE-REVIEW.md`](CHALLENGE-REVIEW.md) | Mapping to the four criteria |
 | [`SUBMISSION-CHECKLIST.md`](SUBMISSION-CHECKLIST.md) | Completion state |
 | [`HACKATHON-WORK.md`](HACKATHON-WORK.md) | Work provenance |
-| [`ASSET-RIGHTS-CHECK.md`](ASSET-RIGHTS-CHECK.md) | Asset rights review (human step outstanding) |
+| [`ASSET-RIGHTS-CHECK.md`](ASSET-RIGHTS-CHECK.md) | Asset rights review — COMPLETE |

@@ -58,11 +58,10 @@ These are not product-development blockers.
 - [ ] Final link audit
 - [ ] Submit
 
-## Outstanding human review
+## Human review — COMPLETE
 
-- [ ] Final third-party asset-rights review — see
-      [`ASSET-RIGHTS-CHECK.md`](ASSET-RIGHTS-CHECK.md). This remains a genuine
-      human step and is deliberately not marked complete.
+- [x] Final submission asset-rights review completed — creator confirmation
+      recorded in [`ASSET-RIGHTS-CHECK.md`](ASSET-RIGHTS-CHECK.md) on 2026-09-02.
 
 ## Claims discipline
 

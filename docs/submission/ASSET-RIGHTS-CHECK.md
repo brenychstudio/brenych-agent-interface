@@ -42,7 +42,9 @@ The original source captures remain outside the repository. Only the approved We
 
 Screenshots may contain contextual names, logos, or interface elements belonging to third-party platforms. Those marks remain the property of their respective owners. Their appearance does not imply sponsorship, endorsement, transfer of ownership, or a broader license. No third-party rights are invented or claimed here.
 
-Final human review of any material third-party-rights concern is **PENDING**. If a concern is identified, remove or replace the affected asset before public submission rather than broadening this statement.
+Final human submission-rights review was completed on **2026-09-02**. The creator confirmed authorship and submission-use rights for the screenshots, interfaces, artworks and visual materials included in this challenge release. Any incidental third-party names, platform marks or trademarks visible inside authored interface screenshots are not claimed as creator-owned and remain the property of their respective owners.
+
+This confirmation covers challenge and submission use of the approved evidence set recorded above; it does not grant rights for unrelated reuse. If a material third-party-rights concern is identified later, remove or replace the affected asset rather than broadening this statement.
 
 ## Release gate
 
@@ -50,4 +52,4 @@ Final human review of any material third-party-rights concern is **PENDING**. If
 - [x] All 18 committed paths match the evidence media manifest.
 - [x] Public-safety exclusions are documented.
 - [x] Third-party ownership is expressly disclaimed.
-- [ ] Final human submission-rights review completed — **PENDING**
+- [x] Final human submission-rights review completed — confirmed by creator on 2026-09-02
