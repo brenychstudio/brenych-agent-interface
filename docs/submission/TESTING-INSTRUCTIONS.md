@@ -164,7 +164,7 @@ Production build and full gate:
 ```bash
 npm run build
 npm run typecheck
-npm run test          # 240 tests across 40 files
+npm run test          # 244 tests across 41 files
 npm run lint
 npm run validate:media
 npm run validate:evals

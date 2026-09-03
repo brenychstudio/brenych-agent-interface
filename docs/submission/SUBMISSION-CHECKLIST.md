@@ -3,7 +3,7 @@
 Current status: **product complete and certified; submission materials prepared;
 only operational submission steps remain.**
 
-Certified runtime `cf7fc81c7b7829c1adecb9ee4c215cbaeda61ac6` at
+Released runtime `970c3769000e2f30343f9f4f88d627c49f0738d7` at
 `https://brenych-agent-interface.pages.dev/`.
 
 ---
@@ -27,7 +27,7 @@ Certified runtime `cf7fc81c7b7829c1adecb9ee4c215cbaeda61ac6` at
 
 ### Supporting engineering evidence
 
-- [x] 240 automated tests across 40 files
+- [x] 244 automated tests across 41 files
 - [x] Typecheck, lint, build, media validation, eval validation all pass
 - [x] `npm audit` — 0 vulnerabilities
 - [x] Frozen contracts: 7 core projects, 4 showcase systems, 7 tools, 18 media

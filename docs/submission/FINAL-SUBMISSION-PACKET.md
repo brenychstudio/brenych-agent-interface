@@ -11,8 +11,9 @@ One-page source of truth for the submission. Everything here is verified.
 | Live URL | `https://brenych-agent-interface.pages.dev/` |
 | Repository | `https://github.com/brenychstudio/brenych-agent-interface` |
 | License | Apache-2.0 |
-| Certified runtime | `cf7fc81c7b7829c1adecb9ee4c215cbaeda61ac6` |
-| Deployment ID | `863608ce-6ac2-42f3-a7f3-8e40b8650cbc` |
+| Released runtime | `970c3769000e2f30343f9f4f88d627c49f0738d7` |
+| Deployment ID | `e3f4634e-34ea-4541-835e-b9e37cf44c32` |
+| Host-certified runtime | `cf7fc81c7b7829c1adecb9ee4c215cbaeda61ac6` (deployment `863608ce-6ac2-42f3-a7f3-8e40b8650cbc`) — identical JavaScript bundle, one CSS declaration apart |
 | WebMCP | **Chrome certification PASS** (Chrome 152.0.7977.66) |
 | Tool count | **7** |
 | ChatGPT Site Tools | **NOT SEPARATELY CERTIFIED** — the Challenge accepts Chrome |

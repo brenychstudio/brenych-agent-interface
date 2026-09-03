@@ -77,7 +77,7 @@ able to provide structured evidence of what that work proves.
 | Live URL | `https://brenych-agent-interface.pages.dev/` |
 | Public repository | `https://github.com/brenychstudio/brenych-agent-interface` |
 | License | Apache-2.0 |
-| Certified runtime commit | `cf7fc81c7b7829c1adecb9ee4c215cbaeda61ac6` |
+| Released runtime commit | `970c3769000e2f30343f9f4f88d627c49f0738d7` |
 | Video URL | operational step — paste the public YouTube URL |
 
 ## Technical facts available if a field asks for them
@@ -87,7 +87,7 @@ able to provide structured evidence of what that work proves.
 - 18 user-approved WebP evidence assets showing reviewed project interfaces.
 - Deterministic matcher with fixed weights — exact `1.00`, alias `0.90`,
   related `0.45`, missing `0.00`. Coverage is evidence coverage, not probability.
-- 240 automated tests across 40 files; `npm audit` reports 0 vulnerabilities.
+- 244 automated tests across 41 files; `npm audit` reports 0 vulnerabilities.
 - Certified in Google Chrome 152.0.7977.66 with WebMCP enabled; 0 console errors.
 - No LLM runtime, backend, database, authentication, analytics pipeline, or
   private-source access. No external write path of any kind.

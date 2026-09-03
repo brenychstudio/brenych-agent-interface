@@ -5,8 +5,10 @@ production application. It separates source-level evidence from real-host
 certification: automated tests prove the contracts and deterministic handlers,
 but only a real host can prove that a browser discovered and executed the tools.
 
-Every `PASS` below was physically observed on the deployed production origin in
-a real WebMCP-enabled Chrome host.
+Every `PASS` in the host-certification sections below was physically observed on
+the deployed production origin in a real WebMCP-enabled Chrome host. Where a
+check was re-run in a different host, *Post-certification runtime change* names
+that host explicitly and does not fold the result into the original run.
 
 ## Status vocabulary
 
@@ -26,11 +28,52 @@ source inspection.
 | Field | Value |
 | --- | --- |
 | Deployed URL | `https://brenych-agent-interface.pages.dev/` |
-| Immutable deployment URL | `https://863608ce.brenych-agent-interface.pages.dev` |
-| Deployment ID | `863608ce-6ac2-42f3-a7f3-8e40b8650cbc` |
+| Immutable deployment URL | `https://e3f4634e.brenych-agent-interface.pages.dev` |
+| Deployment ID | `e3f4634e-34ea-4541-835e-b9e37cf44c32` |
 | Environment / branch | Production / `main` |
-| Release SHA | `cf7fc81c7b7829c1adecb9ee4c215cbaeda61ac6` |
-| Certification date | 2026-09-02 |
+| Release SHA | `970c3769000e2f30343f9f4f88d627c49f0738d7` |
+| Host certification date | 2026-09-02 |
+| Certified tool surface | Unchanged since 2026-09-02 — see *Post-certification runtime change* |
+
+### Post-certification runtime change
+
+The host certification below was physically run on 2026-09-02 against release
+`cf7fc81c7b7829c1adecb9ee4c215cbaeda61ac6`, deployment
+`863608ce-6ac2-42f3-a7f3-8e40b8650cbc`.
+
+Production was redeployed on 2026-09-03 from
+`970c3769000e2f30343f9f4f88d627c49f0738d7` to fix a presentation defect: the
+capability trace rows overlapped the evidence heading metadata after a match.
+The change is one CSS declaration.
+
+| Check | Result |
+| --- | --- |
+| Deployed JavaScript bundle, old deployment vs new | byte-identical (SHA-256 `ce624b72bfd9992a89ec0a47c95a03578b126a0f9cf08b36a089576a136b577c`) |
+| Deployed stylesheet diff | exactly one declaration: `.capability-trace-list { top: 3.3rem }` → `top: 5.5rem` |
+| Tool definitions, schemas, annotations, handlers | untouched by the commit |
+| Engineering gate at `970c376` | typecheck, 244 tests, lint, build, media, evals — all pass |
+
+Because the shipped tool surface is the identical binary, every `PASS` below
+still describes the code serving production. The statuses are **not** re-run
+claims: the flagged-Chrome host run happened once, on 2026-09-02, on the
+deployment recorded above.
+
+What *was* physically re-run on the new deployment on 2026-09-03, in headless
+Chrome `152` driven over the DevTools Protocol against a `document.modelContext`
+test host rather than the browser's flagged implementation:
+
+| Check | Result | Status |
+| --- | --- | --- |
+| Golden `match_requirements` on `https://brenych-agent-interface.pages.dev/` | output identical to the *Golden scenario* below | `PASS` |
+| Visible recomposition and `WEBMCP ACTION` provenance | present, no heading overlap | `PASS` |
+| Served bundle vs local build of `970c376` | checksum-identical | `PASS` |
+| Console errors | 0 | `PASS` |
+| Desktop widths 1366 / 1656 / 1920, default + manual + WebMCP states | no overlap, no clipping | `PASS` |
+
+The flagged-Chrome host paths — discovery via `getTools()`, `focus_project`,
+scroll restoration, `create_collaboration_brief`, negative fit — were **not**
+re-executed in a real WebMCP host on the new deployment. They are carried
+forward on the byte-identical-bundle evidence above, not on a second host run.
 
 ## Host environment
 
@@ -237,6 +280,10 @@ Certification must stop and the release must not claim full WebMCP success if:
 
 None of these conditions were met during the certifying run.
 
+The last condition is why the 2026-09-03 redeploy is recorded as its own
+section rather than folded into the run above: the host-certified SHA and the
+current release SHA are different commits, and both are stated.
+
 ## Final sign-off
 
 ```text
@@ -245,9 +292,14 @@ CHROME_WEBMCP_CERTIFICATION=PASS
 CHATGPT_SITE_TOOLS_CERTIFICATION=NOT_SEPARATELY_CERTIFIED
 
 CERTIFIED_AT=2026-09-02
-RELEASE_SHA=cf7fc81c7b7829c1adecb9ee4c215cbaeda61ac6
+HOST_CERTIFIED_SHA=cf7fc81c7b7829c1adecb9ee4c215cbaeda61ac6
+HOST_CERTIFIED_DEPLOYMENT_ID=863608ce-6ac2-42f3-a7f3-8e40b8650cbc
+
+RELEASE_SHA=970c3769000e2f30343f9f4f88d627c49f0738d7
 DEPLOYED_URL=https://brenych-agent-interface.pages.dev/
-DEPLOYMENT_ID=863608ce-6ac2-42f3-a7f3-8e40b8650cbc
+DEPLOYMENT_ID=e3f4634e-34ea-4541-835e-b9e37cf44c32
+RUNTIME_DELTA=one CSS declaration; JavaScript bundle byte-identical
+GOLDEN_CALL_REVERIFIED_ON_RELEASE=PASS
 HOST=Google Chrome 152.0.7977.66 with enable-webmcp-testing
 TOOL_COUNT=7
 CONSOLE_ERRORS=0

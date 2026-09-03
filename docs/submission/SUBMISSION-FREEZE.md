@@ -10,10 +10,11 @@ items are operational submission steps, not product work.
 
 | Field | Value |
 | --- | --- |
-| Runtime certified commit | `cf7fc81c7b7829c1adecb9ee4c215cbaeda61ac6` |
+| Released runtime commit | `970c3769000e2f30343f9f4f88d627c49f0738d7` |
 | Canonical live URL | `https://brenych-agent-interface.pages.dev/` |
-| Certified deployment ID | `863608ce-6ac2-42f3-a7f3-8e40b8650cbc` |
-| Immutable deployment URL | `https://863608ce.brenych-agent-interface.pages.dev` |
+| Production deployment ID | `e3f4634e-34ea-4541-835e-b9e37cf44c32` |
+| Immutable deployment URL | `https://e3f4634e.brenych-agent-interface.pages.dev` |
+| Host-certified commit | `cf7fc81c7b7829c1adecb9ee4c215cbaeda61ac6` (deployment `863608ce-6ac2-42f3-a7f3-8e40b8650cbc`) — the released runtime ships the byte-identical JavaScript bundle and differs by one CSS declaration |
 | Deployment environment | Production |
 | Deployment branch | `main` |
 | Public repository | `https://github.com/brenychstudio/brenych-agent-interface` |
@@ -46,12 +47,12 @@ and negative-fit behaviour were all observed on the deployed origin.
 | Reduced motion | PASS |
 | Served bundle | checksum-verified identical to the local certified build |
 
-## Engineering gate at the certified commit
+## Engineering gate at the released commit
 
 | Gate | Result |
 | --- | --- |
 | Typecheck / lint / build | PASS |
-| Automated tests | 240 passed across 40 files |
+| Automated tests | 244 passed across 41 files |
 | Media validation | PASS |
 | Eval validation | PASS |
 | `git diff --check` | clean |

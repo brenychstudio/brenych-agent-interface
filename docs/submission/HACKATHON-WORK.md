@@ -9,17 +9,17 @@ public-safe evidence and are not presented as challenge implementation work.
 
 | Field | Value |
 | --- | --- |
-| Final certified runtime | `cf7fc81c7b7829c1adecb9ee4c215cbaeda61ac6` |
+| Final released runtime | `970c3769000e2f30343f9f4f88d627c49f0738d7` |
 | Production URL | `https://brenych-agent-interface.pages.dev/` |
-| Deployment ID | `863608ce-6ac2-42f3-a7f3-8e40b8650cbc` |
-| WebMCP Chrome certification | **PASS** |
-| Automated tests | 240 across 40 files |
+| Deployment ID | `e3f4634e-34ea-4541-835e-b9e37cf44c32` |
+| WebMCP Chrome certification | **PASS** — on `cf7fc81c7b7829c1adecb9ee4c215cbaeda61ac6` / `863608ce-6ac2-42f3-a7f3-8e40b8650cbc`, whose JavaScript bundle the released runtime ships byte-identically |
+| Automated tests | 244 across 41 files |
 | License | Apache-2.0 |
 
 ## Challenge-period commit history
 
 These rows are development history, not the current release. The current
-certified runtime is the commit recorded above.
+released runtime is the commit recorded above.
 
 | Date | Commit | Work |
 | --- | --- | --- |
@@ -30,6 +30,7 @@ certified runtime is the commit recorded above.
 | 2026-09-02 | `0c64d93ea0b4772f58f519a7f2fe5100264018e8` | `fix: complete cinematic evidence presentation` |
 | 2026-09-02 | `ee5d836912744b8e25d3248e6abca8175300b955` | `fix: finalize submission motion and navigation` |
 | 2026-09-02 | `cf7fc81c7b7829c1adecb9ee4c215cbaeda61ac6` | `fix: execute WebMCP tools in hosts that pass no execution options` |
+| 2026-09-03 | `970c3769000e2f30343f9f4f88d627c49f0738d7` | `fix: prevent evidence metadata overlap` |
 
 ## What was built during the challenge
 

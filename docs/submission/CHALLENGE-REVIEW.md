@@ -1,7 +1,7 @@
 # Challenge Criteria Review
 
 Review date: **2026-09-02**
-Subject: certified runtime `cf7fc81c7b7829c1adecb9ee4c215cbaeda61ac6` at
+Subject: released runtime `970c3769000e2f30343f9f4f88d627c49f0738d7` at
 `https://brenych-agent-interface.pages.dev/`
 
 This document maps the shipped product to the four official judging criteria. It
@@ -49,7 +49,7 @@ carry `untrustedContentHint: true`.
 - **Accessibility and reduced motion** — focus is trapped and restored, surfaces
   are keyboard-reachable, and `prefers-reduced-motion` resolves every surface to
   its final state with no travelling media.
-- **240 automated tests** across 40 files, plus media and eval validators.
+- **244 automated tests** across 41 files, plus media and eval validators.
 - **Zero known production console errors**; `npm audit` reports 0
   vulnerabilities.
 
